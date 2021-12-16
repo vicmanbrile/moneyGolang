@@ -1,9 +1,5 @@
 package main
 
-type Perfil struct {
-	Creditos []Product `json:"credit"`
-}
-
 type Product struct {
 	ID   string `json:"id"`
 	Date struct {
@@ -17,7 +13,7 @@ type Product struct {
 	} `json:"datails"`
 }
 
-func (p Product) priceMount() float64 {
+func (p Product) PriceMount() float64 {
 	var price float64
 	if p.Datails.Interes > 0 && p.Datails.Interes < 1 {
 		price = p.Datails.Precing * (p.Datails.Interes + 1)
@@ -27,10 +23,10 @@ func (p Product) priceMount() float64 {
 	return price / float64(p.Datails.Mensualy)
 }
 
-func (p Product) ultimeMount() int {
+func (p Product) UltimeMount() int {
 	return (p.Date.Mount + p.Datails.Mensualy) % 12
 }
 
-func (p Product) ultimeYear() int {
+func (p Product) UltimeYear() int {
 	return p.Date.Year + (p.Date.Mount/12 + p.Datails.Mensualy/12)
 }
