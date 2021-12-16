@@ -1,0 +1,28 @@
+{
+    "credit" : [
+        {
+            "id": "Computadora",
+            "date": {
+                "mount": 1,
+                "year": 22
+            },
+            "datails":{
+                "interes": 0.15,
+                "precing": 12000,
+                "mensualy": 18
+            }
+        },
+        {
+            "id": "Mouse",
+            "date": {
+                "mount": 1,
+                "year": 20
+            },
+            "datails":{
+                "interes": 0.18,
+                "precing": 1500,
+                "mensualy": 12
+            }
+        }
+    ]
+}
