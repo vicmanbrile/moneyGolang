@@ -1,7 +1,7 @@
 package main
 
 type Product struct {
-	ID   string `json:"id"`
+	Name string `json:"name"`
 	Date struct {
 		Mount int `json:"mount"`
 		Year  int `json:"year"`
@@ -20,7 +20,13 @@ func (p Product) PriceMount() float64 {
 	} else {
 		price = p.Datails.Precing
 	}
-	return price / float64(p.Datails.Mensualy)
+
+	if p.Datails.Mensualy == 0 {
+		return 0
+	} else {
+		return price / float64(p.Datails.Mensualy)
+	}
+
 }
 
 func (p Product) UltimeMount() int {
@@ -29,4 +35,8 @@ func (p Product) UltimeMount() int {
 
 func (p Product) UltimeYear() int {
 	return p.Date.Year + (p.Date.Mount/12 + p.Datails.Mensualy/12)
+}
+
+func (p Product) GetName() string {
+	return p.Name + " de Creditos"
 }
