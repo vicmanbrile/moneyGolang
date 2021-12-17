@@ -17,6 +17,10 @@ type Report interface {
 	GetName() string
 }
 
+type Resumen interface {
+	priceMount() float64
+}
+
 func main() {
 
 	file, err := ioutil.ReadFile("filename.json")
