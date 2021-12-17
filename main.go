@@ -6,9 +6,16 @@ import (
 	"io/ioutil"
 )
 
-var (
-	err error
-)
+type Perfil struct {
+	Creditos     []Product     `json:"credit"`
+	Deudas       []Debt        `json:"debts"`
+	Suscriptions []Suscription `json:"suscriptions"`
+}
+
+type Report interface {
+	PriceMount() float64
+	GetName() string
+}
 
 func main() {
 
@@ -24,6 +31,25 @@ func main() {
 		fmt.Printf("Error al convertir a JSON: %v", err)
 	}
 
-	fmt.Printf("%+v", len(data.Creditos))
+	for _, value := range data.Creditos {
+		MonthlyPayment(value)
+		MonthlyDaysPayment(value)
+	}
 
+	for _, value := range data.Deudas {
+		MonthlyPayment(value)
+		MonthlyDaysPayment(value)
+	}
+
+}
+
+func MonthlyPayment(r Report) {
+	total := r.PriceMount()
+
+	fmt.Printf("Pagar $%.2f para %s en un mes.\n", total, r.GetName())
+}
+
+func MonthlyDaysPayment(r Report) {
+	total := r.PriceMount() / 30
+	fmt.Printf("Pagar $%.2f a %s. por día.\n", total, r.GetName())
 }
