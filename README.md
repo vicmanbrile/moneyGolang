@@ -2,6 +2,10 @@
 
 ```json
 {
+    "wallets": {
+        "cash":  1197.5,
+        "banking": 3919.05
+    },
     "credit" : [
         {
             "name": "template",
@@ -19,7 +23,7 @@
     "debts" : [
         {
             "name": "Gabriela León",
-            "amount" : 3369.70,
+            "amount" : 3718.78,
             "days" : 60
         },
         {
