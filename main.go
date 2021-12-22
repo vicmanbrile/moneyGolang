@@ -14,7 +14,6 @@ type Perfil struct {
 
 type Report interface {
 	PriceMount() float64
-	GetName() string
 }
 
 func main() {
@@ -46,10 +45,10 @@ func main() {
 func MonthlyPayment(r Report) {
 	total := r.PriceMount()
 
-	fmt.Printf("Pagar $%.2f para %s en un mes.\n", total, r.GetName())
+	fmt.Printf("Pagar $%.2f para en un mes.\n", total)
 }
 
 func MonthlyDaysPayment(r Report) {
 	total := r.PriceMount() / 30
-	fmt.Printf("Pagar $%.2f a %s. por día.\n", total, r.GetName())
+	fmt.Printf("Pagar $%.2f a por día.\n", total)
 }
