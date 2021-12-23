@@ -36,7 +36,3 @@ func (p Product) UltimeMount() int {
 func (p Product) UltimeYear() int {
 	return p.Date.Year + (p.Date.Mount/12 + p.Datails.Mensualy/12)
 }
-
-func (p Product) GetName() string {
-	return p.Name + " de Creditos"
-}

@@ -7,10 +7,6 @@ type Debt struct {
 }
 
 func (d Debt) PriceMount() float64 {
-	total := (d.Amount / d.Days) * 30
+	total := (d.Amount / d.Days) * MOUNTH
 	return float64(total)
-}
-
-func (d Debt) GetName() string {
-	return d.Name + " de Deudas"
 }

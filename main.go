@@ -6,6 +6,10 @@ import (
 	"io/ioutil"
 )
 
+var (
+	MOUNTH float64 = 28
+)
+
 type Perfil struct {
 	Creditos     []Product     `json:"credit"`
 	Deudas       []Debt        `json:"debts"`
@@ -14,7 +18,6 @@ type Perfil struct {
 
 type Report interface {
 	PriceMount() float64
-	GetName() string
 }
 
 func main() {
@@ -41,15 +44,20 @@ func main() {
 		MonthlyDaysPayment(value)
 	}
 
+	for _, value := range data.Suscriptions {
+		MonthlyPayment(value)
+		MonthlyDaysPayment(value)
+	}
+
 }
 
 func MonthlyPayment(r Report) {
 	total := r.PriceMount()
 
-	fmt.Printf("Pagar $%.2f para %s en un mes.\n", total, r.GetName())
+	fmt.Printf("Pagar $%.2f en un mes.\n", total)
 }
 
 func MonthlyDaysPayment(r Report) {
-	total := r.PriceMount() / 30
-	fmt.Printf("Pagar $%.2f a %s. por día.\n", total, r.GetName())
+	total := r.PriceMount() / MOUNTH
+	fmt.Printf("Pagar $%.2f por día.\n", total)
 }
