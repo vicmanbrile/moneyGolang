@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	MOUNTH float64 = 28
+	DAYS_MOUNTH  float64 = 28
+	MOUNTHS_YEAR float64 = 12
 )
 
 type Perfil struct {
@@ -30,4 +31,22 @@ func main() {
 		fmt.Printf("Error al convertir a JSON: %v", err)
 	}
 
+	fmt.Printf("$%.2f\n", data.PriceMount())
+
+}
+
+func (p *Perfil) PriceMount() float64 {
+	var total float64
+
+	for _, value := range p.Creditos {
+		total += value.PriceMount()
+	}
+	for _, value := range p.Deudas {
+		total += value.PriceMount()
+	}
+	for _, value := range p.Suscriptions {
+		total += value.PriceMount()
+	}
+
+	return total
 }

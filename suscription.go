@@ -11,7 +11,7 @@ func (s Suscription) PriceMount() float64 {
 	case "monthly":
 		return s.Pricing
 	case "yearly":
-		return s.Pricing / float64(12)
+		return s.Pricing / MOUNTHS_YEAR
 	default:
 		return 0
 	}
