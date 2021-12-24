@@ -31,6 +31,18 @@
             "amount" : 4179.00,
             "days" : 60
         }
+    ],
+    "suscriptions": [
+        {
+            "name": "Spotify",
+            "type": "monthly",
+            "pricing": 60
+        }
+        {
+            "name": "Targeta",
+            "type": "yearly",
+            "pricing": 200.20
+        }
     ]
     
 }
