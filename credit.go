@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Product struct {
 	Name string `json:"name"`
 	Date struct {
@@ -27,6 +29,21 @@ func (p Product) PriceMount() float64 {
 		return price / float64(p.Datails.Mensualy)
 	}
 
+}
+
+func (p Product) PriceForDays() float64 {
+	return p.PriceMount() / DAYS_MOUNTH
+}
+
+func (p Product) Resumen(salary float64) []string {
+	info := make([]string, 4)
+
+	info[0] = "Credito"
+	info[1] = p.Name
+	info[2] = fmt.Sprintf("%%%.2f", (p.PriceForDays()/salary)*100)
+	info[3] = fmt.Sprintf("$%.2f", p.PriceForDays())
+
+	return info
 }
 
 func (p Product) UltimeMount() int {
