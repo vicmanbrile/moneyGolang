@@ -3,6 +3,7 @@
 ```json
 {
     "wallets": {
+        "average" : 400,
         "cash":  1197.5,
         "banking": 3919.05
     },
@@ -37,13 +38,12 @@
             "name": "Spotify",
             "type": "monthly",
             "pricing": 60
-        }
+        },
         {
-            "name": "Targeta",
-            "type": "yearly",
-            "pricing": 200.20
+            "name": "Dentista",
+            "type": "monthly",
+            "pricing": 700
         }
     ]
-    
 }
 ```
