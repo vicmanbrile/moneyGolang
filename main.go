@@ -91,7 +91,7 @@ func (p *Perfil) PrintTable() {
 
 	info := p.Resumen()
 
-	table.SetFooter([]string{"", "Total:", fmt.Sprintf("%%%.2f", (p.PriceForDays()/p.Wallets.Average)*100), fmt.Sprintf("$%.2f", p.PriceForDays())})
+	table.SetFooter([]string{"", "Total:", fmt.Sprintf("%.2f%%", (p.PriceForDays()/p.Wallets.Average)*100), fmt.Sprintf("$%.2f", p.PriceForDays())})
 
 	for _, v := range info {
 		table.Append(v)

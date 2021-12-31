@@ -22,7 +22,7 @@ func (d Debt) Resumen(salary float64) []string {
 
 	info[0] = "Deudas"
 	info[1] = d.Name
-	info[2] = fmt.Sprintf("%%%.2f", (d.PriceForDays()/salary)*100)
+	info[2] = fmt.Sprintf("%.2f%%", (d.PriceForDays()/salary)*100)
 	info[3] = fmt.Sprintf("$%.2f", d.PriceForDays())
 
 	return info

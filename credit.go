@@ -40,7 +40,7 @@ func (p Product) Resumen(salary float64) []string {
 
 	info[0] = "Credito"
 	info[1] = p.Name
-	info[2] = fmt.Sprintf("%%%.2f", (p.PriceForDays()/salary)*100)
+	info[2] = fmt.Sprintf("%.2f%%", (p.PriceForDays()/salary)*100)
 	info[3] = fmt.Sprintf("$%.2f", p.PriceForDays())
 
 	return info

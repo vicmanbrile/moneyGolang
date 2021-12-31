@@ -26,7 +26,7 @@ func (s Suscription) Resumen(salary float64) []string {
 
 	info[0] = "Suscripciones"
 	info[1] = s.Name
-	info[2] = fmt.Sprintf("%%%.2f", (s.PriceForDays()/salary)*100)
+	info[2] = fmt.Sprintf("%.2f%%", (s.PriceForDays()/salary)*100)
 	info[3] = fmt.Sprintf("$%.2f", s.PriceForDays())
 
 	return info
