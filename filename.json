@@ -1,26 +1,9 @@
-## Money program in golang
-
-```json
 {
     "wallets": {
-        "average" : 400,
-        "cash":  1197.5,
-        "banking": 3919.05
+        "average" : 250,
+        "cash":  700.5,
+        "banking":  0
     },
-    "credit" : [
-        {
-            "name": "template",
-            "date": {
-                "mount": 0,
-                "year": 0
-            },
-            "datails":{
-                "interes": 0,
-                "precing": 0,
-                "mensualy": 0
-            }
-        }
-    ],
     "debts" : [
         {
             "name": "Gabriela León",
@@ -29,7 +12,7 @@
         },
         {
             "name": "Victor Briseño",
-            "amount" :  2926.15,
+            "amount" : 2926.15,
             "days" : 60
         }
     ],
@@ -40,6 +23,11 @@
             "pricing": 60
         },
         {
+            "name": "YouTube",
+            "type": "monthly",
+            "pricing": 180
+        },
+        {
             "name": "Dentista",
             "type": "monthly",
             "pricing": 700
@@ -48,8 +36,7 @@
     "percentile":[
         {
             "name":"Gabriela León",
-            "percentage": 0.20
+            "percentage": 0.2
         }
     ]
 }
-```

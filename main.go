@@ -9,24 +9,6 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-var (
-	DAYS_MOUNTH  float64 = 28
-	MOUNTHS_YEAR float64 = 12
-)
-
-type Perfil struct {
-	Creditos     []Product     `json:"credit"`
-	Deudas       []Debt        `json:"debts"`
-	Suscriptions []Suscription `json:"suscriptions"`
-	Wallets      Wallet        `json:""wallets`
-}
-
-type Wallet struct {
-	Cash    float64 `json:"cash"`
-	Average float64 `json:"average"`
-	Banking float64 `json:"banking"`
-}
-
 func main() {
 
 	file, err := ioutil.ReadFile("filename.json")
@@ -58,6 +40,10 @@ func (p *Perfil) PriceMount() float64 {
 		total += value.PriceMount()
 	}
 
+	for _, value := range p.Percentiles {
+		total += value.PriceMount(p.Wallets.Average)
+	}
+
 	return total
 }
 
@@ -77,6 +63,10 @@ func (p *Perfil) Resumen() [][]string {
 	}
 
 	for _, value := range p.Suscriptions {
+		info = append(info, value.Resumen(p.Wallets.Average))
+	}
+
+	for _, value := range p.Percentiles {
 		info = append(info, value.Resumen(p.Wallets.Average))
 	}
 
