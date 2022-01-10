@@ -1,6 +1,6 @@
 {
     "wallets": {
-        "average" : 250,
+        "average" : 240,
         "cash":  700.5,
         "banking":  0
     },
@@ -8,7 +8,7 @@
         {
             "name": "Gabriela León",
             "amount" :  1168.66,
-            "days" : 60
+            "days" : 120
         },
         {
             "name": "Victor Briseño",
@@ -31,6 +31,21 @@
             "name": "Dentista",
             "type": "monthly",
             "pricing": 700
+        },
+        {
+            "name": "Platzi",
+            "type": "monthly",
+            "pricing": 580
+        },
+        {
+            "name": "Barbero",
+            "type": "monthly",
+            "pricing": 300
+        },
+        {
+            "name": "Telcel",
+            "type": "monthly",
+            "pricing": 300
         }
     ],
     "percentile":[
