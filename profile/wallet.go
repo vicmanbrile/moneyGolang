@@ -1,4 +1,4 @@
-package main
+package profile
 
 type Wallet struct {
 	Cash    float64 `json:"cash"`
