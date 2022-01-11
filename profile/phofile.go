@@ -13,7 +13,7 @@ var (
 )
 
 type Perfil struct {
-	Creditos     []Product     `json:"credit"`
+	Creditos     []Credit      `json:"credit"`
 	Deudas       []Debt        `json:"debts"`
 	Suscriptions []Suscription `json:"suscriptions"`
 	Wallets      Wallet        `json:"wallets"`
@@ -34,7 +34,7 @@ func (p *Perfil) PriceMount() float64 {
 	}
 
 	for _, value := range p.Percentiles {
-		total += value.PriceMount(p.Wallets.Average)
+		total += value.PriceMount() * p.Wallets.Average
 	}
 
 	return total

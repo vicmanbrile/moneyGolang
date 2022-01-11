@@ -7,8 +7,8 @@ type Percentile struct {
 	Percentage float64 `json:"Percentage"`
 }
 
-func (p Percentile) PriceMount(salary float64) float64 {
-	total := salary * p.Percentage * DAYS_MOUNTH
+func (p Percentile) PriceMount() float64 {
+	total := p.Percentage * DAYS_MOUNTH
 	return total
 }
 

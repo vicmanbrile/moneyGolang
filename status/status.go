@@ -29,7 +29,7 @@ func Resumen(sumas ...string) {
 	Falta := presupuesto() - sumaTenemos(tenemos)
 	fmt.Printf("Falta: %.2f\n", Falta)
 	fmt.Printf("Status %.2f\n", (0-Falta)/(porcentajeAGuardar*dineroPromedio))
-	fmt.Println("Libres", dineroPromedio*((100-porcentajeAGuardar)/100))
+	fmt.Println("Libres", ((dineroPromedio * ((100 - porcentajeAGuardar) / 100)) * automaticTime(Year)))
 
 }
 
