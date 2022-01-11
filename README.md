@@ -1,35 +1,22 @@
-## Money program in golang
+# Money program in golang
 
+## Archivo estado de cuenta
 ```json
 {
     "wallets": {
-        "average" : 400,
-        "cash":  1197.5,
-        "banking": 3919.05
+        "average" : 240,
+        "cash":  700.5,
+        "banking":  0
     },
-    "credit" : [
-        {
-            "name": "template",
-            "date": {
-                "mount": 0,
-                "year": 0
-            },
-            "datails":{
-                "interes": 0,
-                "precing": 0,
-                "mensualy": 0
-            }
-        }
-    ],
     "debts" : [
         {
             "name": "Gabriela León",
             "amount" :  1168.66,
-            "days" : 60
+            "days" : 120
         },
         {
             "name": "Victor Briseño",
-            "amount" :  2926.15,
+            "amount" : 2926.15,
             "days" : 60
         }
     ],
@@ -40,16 +27,45 @@
             "pricing": 60
         },
         {
+            "name": "YouTube",
+            "type": "monthly",
+            "pricing": 180
+        },
+        {
             "name": "Dentista",
             "type": "monthly",
             "pricing": 700
+        },
+        {
+            "name": "Platzi",
+            "type": "monthly",
+            "pricing": 580
+        },
+        {
+            "name": "Barbero",
+            "type": "monthly",
+            "pricing": 300
+        },
+        {
+            "name": "Telcel",
+            "type": "monthly",
+            "pricing": 300
         }
     ],
     "percentile":[
         {
             "name":"Gabriela León",
-            "percentage": 0.20
+            "percentage": 0.2
         }
     ]
 }
+```
+
+## CLI
+
+```zsh
+ go run . 
+            -file <Filename.json>
+            "gastado.csv" "guardados.csv" "extras.csv"
+
 ```
