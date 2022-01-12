@@ -1,6 +1,7 @@
 # Money program in golang
 
 ## Archivo estado de cuenta
+
 ```json
 {
     "wallets": {
