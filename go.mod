@@ -7,4 +7,4 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 )
 
-require github.com/gocarina/gocsv v0.0.0-20211203214250-4735fba0c1d9 // indirect
+require github.com/gocarina/gocsv v0.0.0-20211203214250-4735fba0c1d9
