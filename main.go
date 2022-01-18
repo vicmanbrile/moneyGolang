@@ -4,26 +4,21 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 
+	database_mongodb "github.com/vicmanbrile/moneyGolang/database"
 	"github.com/vicmanbrile/moneyGolang/profile"
 	"github.com/vicmanbrile/moneyGolang/status"
 )
 
 func main() {
 
-	Filename := flag.String("file", "", "string")
+	document, err := database_mongodb.Connection()
+
 	flag.Parse()
 	Registro := flag.Args()
 
-	file, err := ioutil.ReadFile(*Filename)
-	if err != nil {
-		fmt.Printf("Error al convertir a JSON: %v", err)
-	}
-
 	data := &profile.Perfil{}
-
-	err = json.Unmarshal(file, &data)
+	err = json.Unmarshal(document, &data)
 	if err != nil {
 		fmt.Printf("Error al convertir a JSON: %v", err)
 	}
