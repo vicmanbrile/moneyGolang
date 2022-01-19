@@ -2,21 +2,36 @@ package status
 
 import (
 	"fmt"
-	"os"
 	"time"
 
-	"github.com/gocarina/gocsv"
+	"github.com/vicmanbrile/moneyGolang/profile"
 )
 
 type Registers struct {
-	Gastados  []Valores
-	Guardados []Valores
-	Extras    []Valores
+	Spent []struct {
+		Key   string  `json:"key"`
+		Value float64 `json:"value"`
+	} `json:"spent"`
+	Saved []struct {
+		Key   string  `json:"key"`
+		Value float64 `json:"value"`
+	} `json:"saved"`
+	Extras []struct {
+		Week  float64 `json:"week"`
+		Extra float64 `json:"extra"`
+		Days  float64 `json:"days"`
+	} `json:"extras"`
 }
-type Valores struct { // Our example struct, you can use "-" to ignore a field
-	Id    string  `csv:"Clave"`
-	Value float64 `csv:"Valor"`
+
+// Presupuesto por ganados | Falta | Libres | Estatus | Libres
+// Presupuesto por ahora   | Falta | Libres | Estatus | Libres
+
+func (r *Registers) BudgetsNow(w profile.Wallet) float64 {
+	days := automaticTime(Year)
+	return days * w.Average
 }
+
+func (r *Registers) BudgetsWon(w profile.Wallet) {}
 
 var (
 	Year               int     = 2022
@@ -25,28 +40,29 @@ var (
 )
 
 func Resumen(sumas ...string) {
+	/*
+		var all = make([][]*Valores, 3)
 
-	var all = make([][]*Valores, 3)
+		for index, value := range sumas {
+			result := ReadFiles(value)
+			all[index] = result
+		}
 
-	for index, value := range sumas {
-		result := ReadFiles(value)
-		all[index] = result
-	}
-
-	var tenemos float64
-	for _, v := range all[0] {
-		tenemos += v.Value
-	}
-	for _, v := range all[1] {
-		tenemos += v.Value
-	}
-	for _, v := range all[2] {
-		tenemos -= v.Value
-	}
+		var tenemos float64
+		for _, v := range all[0] {
+			tenemos += v.Value
+		}
+		for _, v := range all[1] {
+			tenemos += v.Value
+		}
+		for _, v := range all[2] {
+			tenemos -= v.Value
+		}
+	*/
 
 	fmt.Printf("Dia %.2f\n", automaticTime(Year))
 	fmt.Printf("Presupuesto: %.2f \n", presupuesto())
-	Falta := presupuesto() - tenemos
+	Falta := presupuesto() // - tenemos
 	fmt.Printf("Falta: %.2f\n", Falta)
 	fmt.Printf("Status %.2f\n", (0-Falta)/((porcentajeAGuardar/100)*dineroPromedio))
 	fmt.Printf("Libres: %.2f\n", ((dineroPromedio * ((100 - porcentajeAGuardar) / 100)) * automaticTime(Year)))
@@ -62,14 +78,4 @@ func automaticTime(year int) float64 {
 
 func presupuesto() float64 {
 	return dineroPromedio * (porcentajeAGuardar / 100) * float64(automaticTime(Year))
-}
-
-func ReadFiles(arg string) (total []*Valores) {
-	file, _ := os.OpenFile(arg, os.O_RDWR|os.O_CREATE, os.ModePerm)
-
-	if err := gocsv.UnmarshalFile(file, &total); err != nil { // Load clients from file
-		panic(err)
-	}
-
-	return
 }

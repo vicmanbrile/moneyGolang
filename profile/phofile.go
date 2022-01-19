@@ -14,12 +14,12 @@ var (
 )
 
 type Perfil struct {
-	Creditos     []Credit           `json:"credit"`
-	Deudas       []Debt             `json:"debts"`
-	Suscriptions []Suscription      `json:"suscriptions"`
-	Wallets      Wallet             `json:"wallets"`
-	Percentiles  []Percentile       `json:"percentile"`
-	Registers    []status.Registers `json:"registers"`
+	Creditos     []Credit         `json:"credit"`
+	Deudas       []Debt           `json:"debts"`
+	Suscriptions []Suscription    `json:"suscriptions"`
+	Wallets      Wallet           `json:"wallets"`
+	Percentiles  []Percentile     `json:"percentile"`
+	Registers    status.Registers `json:"registers"`
 }
 
 func (p *Perfil) PriceMount() float64 {
