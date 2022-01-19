@@ -22,47 +22,43 @@ type Perfil struct {
 	Registers    status.Registers `json:"registers"`
 }
 
-func (p *Perfil) PriceMount() float64 {
-	var total float64
+func (p *Perfil) CalcPerfil() []Resumen {
+	var Todos []Resumen
 
 	for _, value := range p.Creditos {
-		total += value.PriceMount()
+		Todos = append(Todos, *value.CalcCredit())
 	}
 	for _, value := range p.Deudas {
-		total += value.PriceMount()
+		Todos = append(Todos, *value.CalcDebt())
 	}
+
 	for _, value := range p.Suscriptions {
-		total += value.PriceMount()
+		Todos = append(Todos, *value.CalcSuscriptions())
 	}
 
 	for _, value := range p.Percentiles {
-		total += value.PriceMount() * p.Wallets.Average
+		Todos = append(Todos, *value.CalcPercentiles(p.Wallets.Average))
 	}
 
-	return total
+	return Todos
 }
 
-func (p *Perfil) PriceForDays() float64 {
-	return p.PriceMount() / DAYS_MOUNTH
+func (p *Perfil) PriceDays() float64 {
+	var result float64
+
+	for _, value := range p.CalcPerfil() {
+		result += value.PriceMount
+	}
+
+	return result / DAYS_MOUNTH
 }
 
 func (p *Perfil) Resumen() [][]string {
 	info := make([][]string, 0)
 
-	for _, value := range p.Creditos {
-		info = append(info, value.Resumen(p.Wallets.Average))
-	}
-
-	for _, value := range p.Deudas {
-		info = append(info, value.Resumen(p.Wallets.Average))
-	}
-
-	for _, value := range p.Suscriptions {
-		info = append(info, value.Resumen(p.Wallets.Average))
-	}
-
-	for _, value := range p.Percentiles {
-		info = append(info, value.Resumen(p.Wallets.Average))
+	for _, value := range p.CalcPerfil() {
+		d := value.Resumen(p.Wallets.Average)
+		info = append(info, d)
 	}
 
 	return info
@@ -76,11 +72,37 @@ func (p *Perfil) PrintTable() {
 
 	info := p.Resumen()
 
-	table.SetFooter([]string{"", "Total:", fmt.Sprintf("%.2f%%", (p.PriceForDays()/p.Wallets.Average)*100), fmt.Sprintf("$%.2f", p.PriceForDays())})
+	table.SetFooter([]string{
+		"",
+		"Total:",
+		fmt.Sprintf("%.2f%%", (p.PriceDays()/p.Wallets.Average)*100),
+		fmt.Sprintf("$%.2f", p.PriceDays()),
+	})
 
 	for _, v := range info {
 		table.Append(v)
 	}
 
 	table.Render()
+}
+
+type Resumen struct {
+	PriceMount float64
+	Name       string
+	Type       string
+}
+
+func (r *Resumen) PriceForDays() float64 {
+	return r.PriceMount / DAYS_MOUNTH
+}
+
+func (r *Resumen) Resumen(salary float64) []string {
+	info := make([]string, 4)
+
+	info[0] = r.Type
+	info[1] = r.Name
+	info[2] = fmt.Sprintf("%.2f%%", (r.PriceForDays()/salary)*100)
+	info[3] = fmt.Sprintf("$%.2f", r.PriceForDays())
+
+	return info
 }

@@ -1,29 +1,16 @@
 package profile
 
-import "fmt"
-
 type Percentile struct {
 	Name       string  `json:"name"`
 	Percentage float64 `json:"Percentage"`
 }
 
-func (p Percentile) PriceMount() float64 {
-	total := p.Percentage * DAYS_MOUNTH
-	return total
-}
+func (p *Percentile) CalcPercentiles(salary float64) *Resumen {
+	var r = &Resumen{
+		Name: p.Name,
+		Type: "Porcentil",
+	}
 
-func (p Percentile) PriceForDays(salary float64) float64 {
-	total := salary * p.Percentage
-	return total
-}
-
-func (p Percentile) Resumen(salary float64) []string {
-	info := make([]string, 4)
-
-	info[0] = "Porcentil"
-	info[1] = p.Name
-	info[2] = fmt.Sprintf("%.2f%%", (p.PriceForDays(salary)/salary)*100)
-	info[3] = fmt.Sprintf("$%.2f", p.PriceForDays(salary))
-
-	return info
+	r.PriceMount = p.Percentage * DAYS_MOUNTH * salary
+	return r
 }
