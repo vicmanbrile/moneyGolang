@@ -47,11 +47,11 @@ func (d *Data) Init() {
 		panic(err)
 	}
 
-	data := &profile.Perfil{}
-	err = json.Unmarshal(jsonData, &data)
+	PERFIL := &profile.Perfil{}
+	err = json.Unmarshal(jsonData, &PERFIL)
 	if err != nil {
 		fmt.Printf("Error al convertir a JSON: %v", err)
 	}
 
-	d.Perfil = *data
+	d.Perfil = *PERFIL
 }

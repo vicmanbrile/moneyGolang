@@ -8,7 +8,12 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-type Status struct { // Our example struct, you can use "-" to ignore a field
+type Registers struct {
+	Gastados  []Valores
+	Guardados []Valores
+	Extras    []Valores
+}
+type Valores struct { // Our example struct, you can use "-" to ignore a field
 	Id    string  `csv:"Clave"`
 	Value float64 `csv:"Valor"`
 }
@@ -21,7 +26,7 @@ var (
 
 func Resumen(sumas ...string) {
 
-	var all = make([][]*Status, 3)
+	var all = make([][]*Valores, 3)
 
 	for index, value := range sumas {
 		result := ReadFiles(value)
@@ -59,7 +64,7 @@ func presupuesto() float64 {
 	return dineroPromedio * (porcentajeAGuardar / 100) * float64(automaticTime(Year))
 }
 
-func ReadFiles(arg string) (total []*Status) {
+func ReadFiles(arg string) (total []*Valores) {
 	file, _ := os.OpenFile(arg, os.O_RDWR|os.O_CREATE, os.ModePerm)
 
 	if err := gocsv.UnmarshalFile(file, &total); err != nil { // Load clients from file
