@@ -47,10 +47,10 @@ func (p *Perfil) PriceDays() float64 {
 	var result float64
 
 	for _, value := range p.CalcPerfil() {
-		result += value.PriceMount
+		result += value.PriceForDays()
 	}
 
-	return result / DAYS_MOUNTH
+	return result
 }
 
 func (p *Perfil) Resumen() [][]string {

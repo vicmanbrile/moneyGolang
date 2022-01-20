@@ -9,7 +9,7 @@ type Suscription struct {
 func (s *Suscription) CalcSuscriptions() *Resumen {
 	var r = &Resumen{
 		Name: s.Name,
-		Type: "Suscription",
+		Type: "Mensualidad",
 	}
 	switch s.Type {
 	case "yearly":
