@@ -1,4 +1,4 @@
-package profile
+package expenses
 
 type Suscription struct {
 	Name    string  `json:"name"`
@@ -6,17 +6,19 @@ type Suscription struct {
 	Pricing float64 `json:"pricing"`
 }
 
-func (s *Suscription) CalcSuscriptions() *Resumen {
+func (s *Suscription) CalcSuscriptions(salary float64) *Resumen {
 	var r = &Resumen{
 		Name: s.Name,
 		Type: "Mensualidad",
 	}
 	switch s.Type {
 	case "yearly":
-		r.PriceMount = s.Pricing / MOUNTHS_YEAR
+		r.PriceDay = s.Pricing / MOUNTHS_YEAR / DAYS_MOUNTH
 	default:
-		r.PriceMount = s.Pricing
+		r.PriceDay = s.Pricing / DAYS_MOUNTH
 	}
+
+	r.ProcentileFloat = r.PriceDay / salary
 
 	return r
 }

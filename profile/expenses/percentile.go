@@ -1,4 +1,4 @@
-package profile
+package expenses
 
 type Percentile struct {
 	Name       string  `json:"name"`
@@ -11,6 +11,8 @@ func (p *Percentile) CalcPercentiles(salary float64) *Resumen {
 		Type: "Porcentil",
 	}
 
-	r.PriceMount = p.Percentage * DAYS_MOUNTH * salary
+	r.PriceDay = p.Percentage * salary
+	r.ProcentileFloat = r.PriceDay / salary
+
 	return r
 }

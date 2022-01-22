@@ -1,4 +1,4 @@
-package profile
+package expenses
 
 type Debt struct {
 	Name   string  `json:"name"`
@@ -6,13 +6,14 @@ type Debt struct {
 	Days   float64 `json:"days"`
 }
 
-func (d *Debt) CalcDebt() *Resumen {
+func (d *Debt) CalcDebt(salary float64) *Resumen {
 	r := &Resumen{
 		Name: d.Name,
 		Type: "Deuda",
 	}
 
-	r.PriceMount = (d.Amount / d.Days) * DAYS_MOUNTH
+	r.PriceDay = d.Amount / d.Days
+	r.ProcentileFloat = r.PriceDay / salary
 
 	return r
 }

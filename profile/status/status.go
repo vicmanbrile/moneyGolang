@@ -1,10 +1,7 @@
 package status
 
 import (
-	"os"
 	"time"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 type Registers struct {
@@ -39,7 +36,7 @@ func (r *Registers) BudgetsNow(money float64) (Bdgt Budget) {
 			restar += value.Value
 		}
 
-		for _, value := range r.Saved {
+		for _, value := range r.Spent {
 			restar += value.Value
 		}
 
@@ -60,7 +57,7 @@ func (r *Registers) BudgetsWon(money float64) (Bdgt Budget) {
 			restar += value.Value
 		}
 
-		for _, value := range r.Saved {
+		for _, value := range r.Spent {
 			restar += value.Value
 		}
 
@@ -72,49 +69,12 @@ func (r *Registers) BudgetsWon(money float64) (Bdgt Budget) {
 	return
 }
 
-func (r *Registers) Resumen(saldo float64) [][]string {
-	info := make([][]string, 0)
-
-	{
-
-	}
-
-	{
-		r.BudgetsWon(saldo)
-	}
-
-	return info
-}
-
-func (r *Registers) PrintTable(money float64) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetBorder(false)
-
-	table.SetHeader([]string{"Dias", "Debemos", "Falta", "Estatus"})
-
-	info := r.Resumen(money)
-
-	table.SetFooter([]string{
-		"",
-		"",
-		"",
-		"",
-	})
-
-	for _, v := range info {
-		table.Append(v)
-	}
-
-	table.Render()
-
-}
-
 func (b *Budget) Lack(percentage float64) float64 {
 	return (b.Total * percentage) - b.Restados
 }
 
 func (b *Budget) Free(percentage float64) float64 {
-	return b.Total * percentage
+	return b.Total * (1 - percentage)
 }
 
 func automaticTime() float64 {

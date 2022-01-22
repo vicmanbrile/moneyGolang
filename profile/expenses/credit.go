@@ -1,4 +1,4 @@
-package profile
+package expenses
 
 type Credit struct {
 	Name string `json:"name"`
@@ -13,7 +13,7 @@ type Credit struct {
 	} `json:"datails"`
 }
 
-func (c *Credit) CalcCredit() *Resumen {
+func (c *Credit) CalcCredit(salary float64) *Resumen {
 	r := &Resumen{
 		Name: c.Name,
 		Type: "Credito",
@@ -27,11 +27,13 @@ func (c *Credit) CalcCredit() *Resumen {
 		}
 
 		if c.Datails.Mensualy == 0 {
-			r.PriceMount = price
+			r.PriceDay = price
 		} else {
-			r.PriceMount = price / float64(c.Datails.Mensualy)
+			r.PriceDay = price / float64(c.Datails.Mensualy)
 		}
 	}
+
+	r.ProcentileFloat = r.PriceDay / salary
 
 	return r
 }

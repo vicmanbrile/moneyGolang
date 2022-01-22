@@ -11,5 +11,5 @@ func main() {
 
 	app.Perfil.PrintTable()
 
-	app.Perfil.Registers.PrintTable(app.Perfil.Wallets.Average)
+	app.Perfil.StutusTable()
 }

@@ -5,35 +5,33 @@ import (
 	"os"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/vicmanbrile/moneyGolang/status"
-)
-
-var (
-	DAYS_MOUNTH  float64 = 30
-	MOUNTHS_YEAR float64 = 12
+	"github.com/vicmanbrile/moneyGolang/profile/expenses"
+	"github.com/vicmanbrile/moneyGolang/profile/status"
 )
 
 type Perfil struct {
-	Creditos     []Credit         `json:"credit"`
-	Deudas       []Debt           `json:"debts"`
-	Suscriptions []Suscription    `json:"suscriptions"`
-	Wallets      Wallet           `json:"wallets"`
-	Percentiles  []Percentile     `json:"percentile"`
-	Registers    status.Registers `json:"registers"`
+	Wallets      Wallet                 `json:"wallets"`
+	Creditos     []expenses.Credit      `json:"credit"`
+	Deudas       []expenses.Debt        `json:"debts"`
+	Suscriptions []expenses.Suscription `json:"suscriptions"`
+	Percentiles  []expenses.Percentile  `json:"percentile"`
+	Registers    status.Registers       `json:"registers"`
 }
 
-func (p *Perfil) CalcPerfil() []Resumen {
-	var Todos []Resumen
+func (p *Perfil) CalcPerfil() []expenses.Resumen {
+	var Todos []expenses.Resumen
+
+	var mySalary float64 = p.Wallets.Average
 
 	for _, value := range p.Creditos {
-		Todos = append(Todos, *value.CalcCredit())
+		Todos = append(Todos, *value.CalcCredit(mySalary))
 	}
 	for _, value := range p.Deudas {
-		Todos = append(Todos, *value.CalcDebt())
+		Todos = append(Todos, *value.CalcDebt(mySalary))
 	}
 
 	for _, value := range p.Suscriptions {
-		Todos = append(Todos, *value.CalcSuscriptions())
+		Todos = append(Todos, *value.CalcSuscriptions(mySalary))
 	}
 
 	for _, value := range p.Percentiles {
@@ -47,7 +45,7 @@ func (p *Perfil) PriceDays() float64 {
 	var result float64
 
 	for _, value := range p.CalcPerfil() {
-		result += value.PriceForDays()
+		result += value.PriceDay
 	}
 
 	return result
@@ -86,23 +84,62 @@ func (p *Perfil) PrintTable() {
 	table.Render()
 }
 
-type Resumen struct {
-	PriceMount float64
-	Name       string
-	Type       string
+func (p *Perfil) StutusTable() {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetBorder(false)
+
+	table.SetHeader([]string{"Tiempo", "Dias", "Debemos", "Libres", "Falta", "Estatus"})
+
+	info := p.StatusResumen()
+
+	table.SetFooter([]string{
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+	})
+
+	for _, v := range info {
+		table.Append(v)
+	}
+
+	table.Render()
 }
 
-func (r *Resumen) PriceForDays() float64 {
-	return r.PriceMount / DAYS_MOUNTH
-}
+func (p *Perfil) StatusResumen() [][]string {
+	info := make([][]string, 0)
 
-func (r *Resumen) Resumen(salary float64) []string {
-	info := make([]string, 4)
+	{
+		var BudgetNow []string
 
-	info[0] = r.Type
-	info[1] = r.Name
-	info[2] = fmt.Sprintf("%.2f%%", (r.PriceForDays()/salary)*100)
-	info[3] = fmt.Sprintf("$%.2f", r.PriceForDays())
+		b := p.Registers.BudgetsNow(p.Wallets.Average)
+
+		BudgetNow = append(BudgetNow, "Actual")
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Dias))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Lack(p.PriceDays()/p.Wallets.Average)))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Free(p.PriceDays()/p.Wallets.Average)))
+		BudgetNow = append(BudgetNow, "")
+		BudgetNow = append(BudgetNow, "")
+
+		info = append(info, BudgetNow)
+	}
+
+	{
+		var BudgetWon []string
+
+		b := p.Registers.BudgetsWon(p.Wallets.Average)
+
+		BudgetWon = append(BudgetWon, "Ganado")
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Dias))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Lack(p.PriceDays()/p.Wallets.Average)))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Free(p.PriceDays()/p.Wallets.Average)))
+		BudgetWon = append(BudgetWon, "")
+		BudgetWon = append(BudgetWon, "")
+
+		info = append(info, BudgetWon)
+	}
 
 	return info
 }
