@@ -76,9 +76,7 @@ func (r *Registers) Resumen(saldo float64) [][]string {
 	info := make([][]string, 0)
 
 	{
-		var row []string
-		dgts := r.BudgetsNow(saldo)
-		row = append("", "", "", "")
+
 	}
 
 	{
