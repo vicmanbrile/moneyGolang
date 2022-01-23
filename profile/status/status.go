@@ -21,9 +21,10 @@ type Registers struct {
 }
 
 type Budget struct {
-	Total    float64
-	Restados float64
-	Dias     float64
+	Total      float64
+	SaveNSpent float64
+	Extra      float64
+	Dias       float64
 }
 
 func (r *Registers) BudgetsNow(money float64) (Bdgt Budget) {
@@ -31,16 +32,26 @@ func (r *Registers) BudgetsNow(money float64) (Bdgt Budget) {
 	Bdgt.Total = Bdgt.Dias * money
 
 	{
-		var restar float64
+		var saveSpent float64
 		for _, value := range r.Saved {
-			restar += value.Value
+			saveSpent += value.Value
 		}
 
 		for _, value := range r.Spent {
-			restar += value.Value
+			saveSpent += value.Value
 		}
 
-		Bdgt.Restados = restar
+		Bdgt.SaveNSpent = saveSpent
+	}
+
+	{
+		var extra float64
+
+		for _, value := range r.Extras {
+			extra += value.Extra
+		}
+
+		Bdgt.Extra = extra
 	}
 
 	return
@@ -52,16 +63,26 @@ func (r *Registers) BudgetsWon(money float64) (Bdgt Budget) {
 		days += value.Days
 	}
 	{
-		var restar float64
+		var saveSpent float64
 		for _, value := range r.Saved {
-			restar += value.Value
+			saveSpent += value.Value
 		}
 
 		for _, value := range r.Spent {
-			restar += value.Value
+			saveSpent += value.Value
 		}
 
-		Bdgt.Restados = restar
+		Bdgt.SaveNSpent = saveSpent
+	}
+
+	{
+		var extra float64
+
+		for _, value := range r.Extras {
+			extra += value.Extra
+		}
+
+		Bdgt.Extra = extra
 	}
 
 	Bdgt.Dias = days
@@ -69,12 +90,16 @@ func (r *Registers) BudgetsWon(money float64) (Bdgt Budget) {
 	return
 }
 
-func (b *Budget) Lack(percentage float64) float64 {
-	return (b.Total * percentage) - b.Restados
+func (b *Budget) Must(percentage float64) float64 {
+	return (b.Total * percentage)
 }
 
 func (b *Budget) Free(percentage float64) float64 {
 	return b.Total * (1 - percentage)
+}
+
+func (b *Budget) Lack() float64 {
+	return (b.Must(.7788) + b.Extra) - b.SaveNSpent
 }
 
 func automaticTime() float64 {

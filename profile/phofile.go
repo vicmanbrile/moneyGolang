@@ -88,11 +88,12 @@ func (p *Perfil) StutusTable() {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetBorder(false)
 
-	table.SetHeader([]string{"Tiempo", "Dias", "Debemos", "Libres", "Falta", "Estatus"})
+	table.SetHeader([]string{"Tiempo", "Dias", "Debemos", "Libres", "Falta", "Guardados", "Extras"})
 
 	info := p.StatusResumen()
 
 	table.SetFooter([]string{
+		"",
 		"",
 		"",
 		"",
@@ -118,10 +119,11 @@ func (p *Perfil) StatusResumen() [][]string {
 
 		BudgetNow = append(BudgetNow, "Actual")
 		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Dias))
-		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Lack(p.PriceDays()/p.Wallets.Average)))
-		BudgetNow = append(BudgetNow, fmt.Sprintf("%.0f", b.Free(p.PriceDays()/p.Wallets.Average)))
-		BudgetNow = append(BudgetNow, "")
-		BudgetNow = append(BudgetNow, "")
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.2f", b.Must(p.PriceDays()/p.Wallets.Average)))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.2f", b.Free(p.PriceDays()/p.Wallets.Average)))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.2f", b.Lack()))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.2f", b.SaveNSpent))
+		BudgetNow = append(BudgetNow, fmt.Sprintf("%.2f", b.Extra))
 
 		info = append(info, BudgetNow)
 	}
@@ -133,10 +135,11 @@ func (p *Perfil) StatusResumen() [][]string {
 
 		BudgetWon = append(BudgetWon, "Ganado")
 		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Dias))
-		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Lack(p.PriceDays()/p.Wallets.Average)))
-		BudgetWon = append(BudgetWon, fmt.Sprintf("%.0f", b.Free(p.PriceDays()/p.Wallets.Average)))
-		BudgetWon = append(BudgetWon, "")
-		BudgetWon = append(BudgetWon, "")
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.2f", b.Must(p.PriceDays()/p.Wallets.Average)))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.2f", b.Free(p.PriceDays()/p.Wallets.Average)))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.2f", b.Lack()))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.2f", b.SaveNSpent))
+		BudgetWon = append(BudgetWon, fmt.Sprintf("%.2f", b.Extra))
 
 		info = append(info, BudgetWon)
 	}
