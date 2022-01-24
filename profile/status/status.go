@@ -1,6 +1,7 @@
 package status
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -9,97 +10,56 @@ type Registers struct {
 		Key   string  `json:"key"`
 		Value float64 `json:"value"`
 	} `json:"spent"`
-	Saved []struct {
-		Key   string  `json:"key"`
-		Value float64 `json:"value"`
-	} `json:"saved"`
-	Extras []struct {
+	Entries []struct {
 		Week  float64 `json:"week"`
-		Extra float64 `json:"extra"`
-		Days  float64 `json:"days"`
-	} `json:"extras"`
+		Money float64 `json:"money"`
+	} `json:"entries"`
+}
+
+func (r *Registers) Budgets() (Bdgt Budget) {
+	for _, value := range r.Entries {
+		Bdgt.Entries += value.Money
+	}
+
+	for _, value := range r.Spent {
+		Bdgt.Spent += value.Value
+	}
+
+	return
 }
 
 type Budget struct {
-	Total      float64
-	SaveNSpent float64
-	Extra      float64
-	Dias       float64
+	Spent   float64
+	Entries float64
 }
 
-func (r *Registers) BudgetsNow(money float64) (Bdgt Budget) {
-	Bdgt.Dias = automaticTime()
-	Bdgt.Total = Bdgt.Dias * money
+func (b *Budget) Free(percentage float64, w *Wallet) string {
 
-	{
-		var saveSpent float64
-		for _, value := range r.Saved {
-			saveSpent += value.Value
-		}
+	debemos := w.Average * percentage * automaticTime()
+	extras := (((b.Entries / w.Average) - automaticTime()) * w.Average)
 
-		for _, value := range r.Spent {
-			saveSpent += value.Value
-		}
+	tenemos := w.Total()
+	pagado := b.Spent
 
-		Bdgt.SaveNSpent = saveSpent
+	var libres float64
+
+	if extras >= 0 {
+		libres = (tenemos + pagado) - (debemos + extras)
+	} else {
+		libres = (tenemos + pagado) - (debemos - extras)
 	}
 
-	{
-		var extra float64
+	result := fmt.Sprintf(`
+	Debemos: %.2f
+	Extras: %.2f
 
-		for _, value := range r.Extras {
-			extra += value.Extra
-		}
+	Tenemos: %.2f
+	Pagado: %.2f
 
-		Bdgt.Extra = extra
-	}
+	Libres: %.2f
+	`, debemos, extras, tenemos, pagado, libres)
 
-	return
-}
-
-func (r *Registers) BudgetsWon(money float64) (Bdgt Budget) {
-	var days float64
-	for _, value := range r.Extras {
-		days += value.Days
-	}
-	{
-		var saveSpent float64
-		for _, value := range r.Saved {
-			saveSpent += value.Value
-		}
-
-		for _, value := range r.Spent {
-			saveSpent += value.Value
-		}
-
-		Bdgt.SaveNSpent = saveSpent
-	}
-
-	{
-		var extra float64
-
-		for _, value := range r.Extras {
-			extra += value.Extra
-		}
-
-		Bdgt.Extra = extra
-	}
-
-	Bdgt.Dias = days
-	Bdgt.Total = days * money
-	return
-}
-
-func (b *Budget) Must(percentage float64) float64 {
-	return (b.Total * percentage)
-}
-
-func (b *Budget) Free(percentage float64) float64 {
-	return b.Total * (1 - percentage)
-}
-
-func (b *Budget) Lack() float64 {
-	return (b.Must(.7788) + b.Extra) - b.SaveNSpent
+	return result
 }
 
 func automaticTime() float64 {

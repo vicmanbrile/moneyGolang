@@ -1,24 +1,18 @@
-package database_mongodb
+package db
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/vicmanbrile/moneyGolang/profile"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Data struct {
-	Perfil profile.Perfil
-}
-
-func (d *Data) Init() {
+func GetData() []byte {
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -47,11 +41,5 @@ func (d *Data) Init() {
 		panic(err)
 	}
 
-	PERFIL := &profile.Perfil{}
-	err = json.Unmarshal(jsonData, &PERFIL)
-	if err != nil {
-		fmt.Printf("Error al convertir a JSON: %v", err)
-	}
-
-	d.Perfil = *PERFIL
+	return jsonData
 }

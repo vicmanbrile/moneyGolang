@@ -1,15 +1,32 @@
 package main
 
 import (
-	database_mongodb "github.com/vicmanbrile/moneyGolang/database"
+	"encoding/json"
+	"fmt"
+	"math"
+
+	"github.com/vicmanbrile/moneyGolang/db"
+	"github.com/vicmanbrile/moneyGolang/profile"
 )
 
 func main() {
+	app := Init()
 
-	app := database_mongodb.Data{}
-	app.Init()
+	matNegative := math.Abs(-5)
+	matPositive := math.Abs(5)
 
-	app.Perfil.PrintTable()
+	fmt.Println(matNegative, matPositive)
 
-	app.Perfil.StutusTable()
+	app.PrintTable()
+	app.StutusTable()
+}
+
+func Init() (d *profile.Perfil) {
+	err := json.Unmarshal(db.GetData(), &d)
+
+	if err != nil {
+		fmt.Printf("Error al convertir a JSON: %v", err)
+	}
+
+	return
 }
