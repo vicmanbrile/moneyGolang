@@ -83,7 +83,7 @@ func (p *Perfil) StutusTable() {
 
 	total := p.Registers.Budgets()
 
-	fmt.Println(total)
+	fmt.Printf("%+v\n", total)
 	fmt.Println(total.Free((p.PriceDays() / p.Wallets.Average), &p.Wallets))
 
 	/*

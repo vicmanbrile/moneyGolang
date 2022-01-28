@@ -35,29 +35,27 @@ type Budget struct {
 
 func (b *Budget) Free(percentage float64, w *Wallet) string {
 
-	debemos := w.Average * percentage * automaticTime()
-	extras := (((b.Entries / w.Average) - automaticTime()) * w.Average)
+	diasPagadas := b.Entries / w.Average
+
+	debemos := w.Average * percentage * diasPagadas
 
 	tenemos := w.Total()
 	pagado := b.Spent
 
-	var libres float64
-
-	if extras >= 0 {
-		libres = (tenemos + pagado) - (debemos + extras)
-	} else {
-		libres = (tenemos + pagado) - (debemos - extras)
-	}
+	libres := tenemos + pagado - debemos
 
 	result := fmt.Sprintf(`
+
+	Dias Pagadas: %.2f
+	Now: %.0f
+
 	Debemos: %.2f
-	Extras: %.2f
 
 	Tenemos: %.2f
 	Pagado: %.2f
 
 	Libres: %.2f
-	`, debemos, extras, tenemos, pagado, libres)
+	`, diasPagadas, automaticTime(), debemos, tenemos, pagado, libres)
 
 	return result
 }
