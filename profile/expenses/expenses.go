@@ -3,8 +3,8 @@ package expenses
 import "fmt"
 
 var (
-	DAYS_MOUNTH  float64 = 30
-	MOUNTHS_YEAR float64 = 12
+	DAYS_MOUNTH  int = 30
+	MOUNTHS_YEAR int = 12
 )
 
 type Resumen struct {
@@ -15,7 +15,7 @@ type Resumen struct {
 }
 
 func (r *Resumen) PriceForMount() float64 {
-	return r.PriceDay * DAYS_MOUNTH
+	return r.PriceDay * float64(DAYS_MOUNTH)
 }
 
 func (r *Resumen) Resumen(salary float64) []string {

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 
 	"github.com/vicmanbrile/moneyGolang/db"
 	"github.com/vicmanbrile/moneyGolang/profile"
@@ -11,11 +10,6 @@ import (
 
 func main() {
 	app := Init()
-
-	matNegative := math.Abs(-5)
-	matPositive := math.Abs(5)
-
-	fmt.Println(matNegative, matPositive)
 
 	app.PrintTable()
 	app.StutusTable()

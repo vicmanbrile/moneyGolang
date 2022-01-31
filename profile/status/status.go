@@ -6,10 +6,6 @@ import (
 )
 
 type Registers struct {
-	Spent []struct {
-		Key   string  `json:"key"`
-		Value float64 `json:"value"`
-	} `json:"spent"`
 	Entries []struct {
 		Week  float64 `json:"week"`
 		Money float64 `json:"money"`
@@ -19,10 +15,6 @@ type Registers struct {
 func (r *Registers) Budgets() (Bdgt Budget) {
 	for _, value := range r.Entries {
 		Bdgt.Entries += value.Money
-	}
-
-	for _, value := range r.Spent {
-		Bdgt.Spent += value.Value
 	}
 
 	return
@@ -40,9 +32,8 @@ func (b *Budget) Free(percentage float64, w *Wallet) string {
 	debemos := w.Average * percentage * diasPagadas
 
 	tenemos := w.Total()
-	pagado := b.Spent
 
-	libres := tenemos + pagado - debemos
+	libres := tenemos - debemos
 
 	result := fmt.Sprintf(`
 
@@ -52,10 +43,9 @@ func (b *Budget) Free(percentage float64, w *Wallet) string {
 	Debemos: %.2f
 
 	Tenemos: %.2f
-	Pagado: %.2f
 
 	Libres: %.2f
-	`, diasPagadas, automaticTime(), debemos, tenemos, pagado, libres)
+	`, diasPagadas, automaticTime(), debemos, tenemos, libres)
 
 	return result
 }
