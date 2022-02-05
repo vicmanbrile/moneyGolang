@@ -11,7 +11,7 @@ import (
 func main() {
 	app := Init()
 
-	app.PrintTable()
+	app.Expenses.PrintTable(app.Wallets.Average)
 	app.StutusTable()
 }
 
