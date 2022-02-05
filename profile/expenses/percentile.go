@@ -1,7 +1,5 @@
 package expenses
 
-import "time"
-
 type Percentile struct {
 	Name       string  `json:"name"`
 	Percentage float64 `json:"Percentage"`
@@ -14,10 +12,11 @@ func (p *Percentile) CalcPercentiles(salary float64) *Resumen {
 		Type: "Porcentil",
 	}
 
-	dayNow := time.Now().AddDate(0, 0, 30).YearDay()
+	r.PriceYear = ((DAYS_MOUNTH * MOUNTHS_YEAR) * p.Percentage) * salary
 
-	r.PriceDay = ((p.Percentage * salary * float64(dayNow)) - p.Spent) / float64(DAYS_MOUNTH)
-	r.ProcentileFloat = r.PriceDay / salary
+	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
+
+	r.Complete = p.Spent / r.PriceYear
 
 	return r
 }

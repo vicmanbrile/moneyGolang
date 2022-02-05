@@ -45,7 +45,7 @@ func (p *Perfil) PriceDays() float64 {
 	var result float64
 
 	for _, value := range p.CalcPerfil() {
-		result += value.PriceDay
+		result += value.PriceDay()
 	}
 
 	return result
@@ -55,7 +55,7 @@ func (p *Perfil) PrintTable() {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetBorder(false)
 
-	table.SetHeader([]string{"Grupo", "Descripcion", "Porcentaje", "$ X D"})
+	table.SetHeader([]string{"Grupo", "Descripcion", "Porcentaje", "$ X D", "Complete"})
 
 	info := make([][]string, 0)
 	{
@@ -70,6 +70,7 @@ func (p *Perfil) PrintTable() {
 		"Total:",
 		fmt.Sprintf("%.2f%%", (p.PriceDays()/p.Wallets.Average)*100),
 		fmt.Sprintf("$%.2f", p.PriceDays()),
+		"",
 	})
 
 	for _, v := range info {

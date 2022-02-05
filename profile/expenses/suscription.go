@@ -1,7 +1,5 @@
 package expenses
 
-import "time"
-
 type Suscription struct {
 	Name    string  `json:"name"`
 	Type    string  `json:"type"`
@@ -15,16 +13,16 @@ func (s *Suscription) CalcSuscriptions(salary float64) *Resumen {
 		Type: "Mensualidad",
 	}
 
-	dayNow := time.Now().AddDate(0, 0, 30).YearDay() / DAYS_MOUNTH
-
 	switch s.Type {
 	case "yearly":
-		r.PriceDay = (((s.Pricing / float64(MOUNTHS_YEAR)) * float64(dayNow)) - s.Spent) / float64(DAYS_MOUNTH)
+		r.PriceYear = s.Pricing
 	default:
-		r.PriceDay = ((s.Pricing * float64(dayNow)) - s.Spent) / float64(DAYS_MOUNTH)
+		r.PriceYear = s.Pricing * MOUNTHS_YEAR
 	}
 
-	r.ProcentileFloat = (r.PriceDay) / salary
+	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
+
+	r.Complete = s.Spent / r.PriceYear
 
 	return r
 }

@@ -12,8 +12,11 @@ func (d *Debt) CalcDebt(salary float64) *Resumen {
 		Type: "Deuda",
 	}
 
-	r.PriceDay = (d.Amount - d.Spent) / float64(DAYS_MOUNTH)
-	r.ProcentileFloat = r.PriceDay / salary
+	r.PriceYear = d.Amount
+
+	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
+
+	r.Complete = d.Spent / r.PriceYear
 
 	return r
 }

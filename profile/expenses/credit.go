@@ -27,13 +27,13 @@ func (c *Credit) CalcCredit(salary float64) *Resumen {
 		}
 
 		if c.Datails.Mensualy == 0 {
-			r.PriceDay = price
+			r.PriceYear = price
 		} else {
-			r.PriceDay = price / float64(c.Datails.Mensualy)
+			r.PriceYear = price / float64(c.Datails.Mensualy)
 		}
 	}
 
-	r.ProcentileFloat = r.PriceDay / salary
+	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
 
 	return r
 }
