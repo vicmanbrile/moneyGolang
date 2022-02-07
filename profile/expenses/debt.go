@@ -1,5 +1,7 @@
 package expenses
 
+import "time"
+
 type Debt struct {
 	Name   string  `json:"name"`
 	Amount float64 `json:"amount"`
@@ -12,11 +14,18 @@ func (d *Debt) CalcDebt(salary float64) *Resumen {
 		Type: "Deuda",
 	}
 
-	r.PriceYear = d.Amount
+	r.MountInit = float64(time.Now().Month())
+	r.MountsToPay = 1
+
+	r.Complete = d.Spent / d.Amount
+
+	if r.Complete >= 1 {
+		r.PriceYear = d.Amount
+	} else {
+		r.PriceYear = d.Amount * 12
+	}
 
 	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
-
-	r.Complete = d.Spent / r.PriceYear
 
 	return r
 }

@@ -8,8 +8,10 @@ type Percentile struct {
 
 func (p *Percentile) CalcPercentiles(salary float64) *Resumen {
 	var r = &Resumen{
-		Name: p.Name,
-		Type: "Porcentil",
+		Name:        p.Name,
+		Type:        "Porcentil",
+		MountInit:   1,
+		MountsToPay: 12,
 	}
 
 	r.PriceYear = ((DAYS_MOUNTH * MOUNTHS_YEAR) * p.Percentage) * salary

@@ -9,8 +9,10 @@ type Suscription struct {
 
 func (s *Suscription) CalcSuscriptions(salary float64) *Resumen {
 	var r = &Resumen{
-		Name: s.Name,
-		Type: "Mensualidad",
+		Name:        s.Name,
+		Type:        "Mensualidad",
+		MountInit:   1,
+		MountsToPay: 12,
 	}
 
 	switch s.Type {
