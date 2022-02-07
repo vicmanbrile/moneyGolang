@@ -21,7 +21,6 @@ func (r *Registers) Budgets() (Bdgt Budget) {
 }
 
 type Budget struct {
-	Spent   float64
 	Entries float64
 }
 
