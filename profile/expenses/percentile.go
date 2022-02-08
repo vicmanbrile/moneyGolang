@@ -6,7 +6,7 @@ type Percentile struct {
 	Spent      float64 `json:"spent"`
 }
 
-func (p *Percentile) CalcPercentiles(salary float64) *Resumen {
+func (p *Percentile) CalculatorResumen(salary float64) *Resumen {
 	var r = &Resumen{
 		Name:        p.Name,
 		Type:        "Porcentil",

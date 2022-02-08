@@ -13,7 +13,7 @@ type Credit struct {
 	} `json:"datails"`
 }
 
-func (c *Credit) CalcCredit(salary float64) *Resumen {
+func (c *Credit) CalculatorResumen(salary float64) *Resumen {
 	r := &Resumen{
 		Name: c.Name,
 		Type: "Credito",

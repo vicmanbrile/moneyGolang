@@ -7,7 +7,7 @@ type Suscription struct {
 	Spent   float64 `json:"spent"`
 }
 
-func (s *Suscription) CalcSuscriptions(salary float64) *Resumen {
+func (s *Suscription) CalculatorResumen(salary float64) *Resumen {
 	var r = &Resumen{
 		Name:        s.Name,
 		Type:        "Mensualidad",

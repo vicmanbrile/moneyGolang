@@ -8,7 +8,7 @@ type Debt struct {
 	Spent  float64 `json:"spent"`
 }
 
-func (d *Debt) CalcDebt(salary float64) *Resumen {
+func (d *Debt) CalculatorResumen(salary float64) *Resumen {
 	r := &Resumen{
 		Name: d.Name,
 		Type: "Deuda",
@@ -19,11 +19,7 @@ func (d *Debt) CalcDebt(salary float64) *Resumen {
 
 	r.Complete = d.Spent / d.Amount
 
-	if r.Complete >= 1 {
-		r.PriceYear = d.Amount
-	} else {
-		r.PriceYear = d.Amount * 12
-	}
+	r.PriceYear = d.Amount
 
 	r.Porcentile = (r.PriceYear / salary) / (DAYS_MOUNTH * MOUNTHS_YEAR)
 

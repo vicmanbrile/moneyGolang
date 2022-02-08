@@ -2,21 +2,46 @@ package profile
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/vicmanbrile/moneyGolang/profile/expenses"
-	"github.com/vicmanbrile/moneyGolang/profile/status"
 )
 
 type Perfil struct {
 	Expenses  expenses.Expenses `json:"expenses"`
-	Registers status.Registers  `json:"registers"`
-	Wallets   status.Wallet     `json:"wallets"`
+	Registers Registers         `json:"registers"`
+	Wallets   Wallet            `json:"wallets"`
 }
 
-func (p *Perfil) StutusTable() {
+func (p *Perfil) Free() string {
 
-	total := p.Registers.Budgets()
+	porcentile := p.Expenses.CalcPerfil(p.Wallets.Average)
 
-	fmt.Printf("%+v\n", total)
-	fmt.Println(total.Free((p.Expenses.PriceDays(p.Wallets.Average) / p.Wallets.Average), &p.Wallets))
+	diasPagadas := p.Registers.Budgets().Entries / p.Wallets.Average
+
+	debemos := p.Wallets.Average * porcentile.FaltaMount() * diasPagadas
+
+	tenemos := p.Wallets.Total() + (porcentile.PriceDays() * float64(time.Now().Month()) * 30 * p.Wallets.Average)
+
+	libres := tenemos - debemos
+
+	result := fmt.Sprintf(`
+
+	Dias Pagadas: %.2f
+	Now: %.0f
+
+	Debemos: %.2f
+
+	Tenemos: %.2f
+
+	Libres: %.2f
+	`, diasPagadas, automaticTime(), debemos, tenemos, libres)
+
+	return result
+}
+
+func automaticTime() float64 {
+	today := time.Now().YearDay()
+
+	return float64(today)
 }

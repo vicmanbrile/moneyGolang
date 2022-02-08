@@ -11,7 +11,16 @@ import (
 var (
 	DAYS_MOUNTH  float64 = 30
 	MOUNTHS_YEAR float64 = 12
+	DAYS_YEAR    float64 = DAYS_MOUNTH * MOUNTHS_YEAR
 )
+
+type Calculator interface {
+	CalculatorResumen(Average float64) Resumen
+}
+
+func CalculatorResumen(w Calculator, Average float64) Resumen {
+	return w.CalculatorResumen(Average)
+}
 
 type Expenses struct {
 	Creditos     []Credit      `json:"credit"`
@@ -20,67 +29,64 @@ type Expenses struct {
 	Percentiles  []Percentile  `json:"percentile"`
 }
 
-func (e *Expenses) CalcPerfil(Average float64) []Resumen {
+func (e *Expenses) CalcPerfil(Average float64) AllExpenses {
 	var Todos []Resumen
 
 	for _, value := range e.Creditos {
-		Todos = append(Todos, *value.CalcCredit(Average))
+		Todos = append(Todos, *value.CalculatorResumen(Average))
 	}
 	for _, value := range e.Deudas {
-		Todos = append(Todos, *value.CalcDebt(Average))
+		Todos = append(Todos, *value.CalculatorResumen(Average))
 	}
 
 	for _, value := range e.Suscriptions {
-		Todos = append(Todos, *value.CalcSuscriptions(Average))
+		Todos = append(Todos, *value.CalculatorResumen(Average))
 	}
 
 	for _, value := range e.Percentiles {
-		Todos = append(Todos, *value.CalcPercentiles(Average))
+		Todos = append(Todos, *value.CalculatorResumen(Average))
 	}
 
-	return Todos
+	var AE AllExpenses
+
+	AE.ToDoExpenses = Todos
+	return AE
 }
 
-func (e *Expenses) PriceDays(Average float64) float64 {
+type AllExpenses struct {
+	ToDoExpenses []Resumen
+}
+
+func (e *AllExpenses) PriceDays() float64 {
 	var result float64
 
-	for _, value := range e.CalcPerfil(Average) {
-		result += value.PriceDay()
+	for _, value := range e.ToDoExpenses {
+		result += value.PorcentileComplete()
 	}
 
 	return result
 }
 
-func (e *Expenses) FaltaMount(Average float64) float64 {
+func (e *AllExpenses) FaltaMount() float64 {
 	var result float64
 
-	for _, value := range e.CalcPerfil(Average) {
-		result += value.PayMountNow()
+	for _, value := range e.ToDoExpenses {
+		result += value.PorcentileNow()
 	}
 
 	return result
 }
 
-func (e *Expenses) FaltaMountPorcentile(Average float64) float64 {
-	var result float64
-
-	for _, value := range e.CalcPerfil(Average) {
-		result += value.PriceDayNow() / 240
-	}
-
-	return result
-}
-
-func (e *Expenses) PrintTable(Average float64) {
+func (e *AllExpenses) PrintTable() {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetBorder(false)
 
-	table.SetHeader([]string{"Grupo", "Descripcion", "Porcentaje", "$ X D", "Falta"})
+	table.SetHeader([]string{"Grupo", "Descripcion", "Porcentaje", "Complete"})
 
 	info := make([][]string, 0)
 	{
-		for _, value := range e.CalcPerfil(Average) {
-			d := value.Resumen(Average)
+		for _, value := range e.ToDoExpenses {
+			d := value.Resumen()
 			info = append(info, d)
 		}
 	}
@@ -88,9 +94,8 @@ func (e *Expenses) PrintTable(Average float64) {
 	table.SetFooter([]string{
 		"",
 		"Total:",
-		fmt.Sprintf("%.2f%%", e.FaltaMountPorcentile(Average)*100),
-		fmt.Sprintf("$%.2f", e.PriceDays(Average)),
-		fmt.Sprintf("$%.2f", e.FaltaMount(Average)),
+		fmt.Sprintf("%.2f%%", e.FaltaMount()*100),
+		fmt.Sprintf("%.2f%%", e.PriceDays()*100),
 	})
 
 	for _, v := range info {
@@ -110,45 +115,42 @@ type Resumen struct {
 	MountsToPay float64
 }
 
-func (r *Resumen) PayMountNow() float64 {
-	mount := float64(time.Now().Month())
+func (r *Resumen) PorcentileNow() (porcentaje float64) {
 
-	var total float64
+	// Dias del año
+	PriceInDays := r.Porcentile * DAYS_YEAR
 
-	// Meses Tener
-	tener := mount - r.MountInit + 1
-	if tener <= 0 {
-		tener = 1
+	// Porcenje a pagar por mes del total
+	PorcentileForMount := ((13 - r.MountsToPay) / MOUNTHS_YEAR)
+
+	MountNow := float64(time.Now().Month())
+	Geting := MountNow - r.MountInit + 1
+	if Geting <= 0 {
+		Geting = 1
 	}
+	// --
+	PorcentileSaved := PorcentileForMount * Geting
 
-	// Meses pagados
-	pagadas := r.MountsToPay * r.Complete
+	formula := (PriceInDays * PorcentileSaved) / (MountNow * DAYS_MOUNTH)
 
-	total = (tener - pagadas) * (r.PriceDay() * 30)
-
-	return total
+	return formula
 }
 
-func (r *Resumen) PriceDay() float64 {
-	return r.PriceYear / (DAYS_MOUNTH * MOUNTHS_YEAR)
+func (r *Resumen) PorcentileComplete() float64 {
+	priceToDays := r.PorcentileNow() * (float64(time.Now().Month()) * DAYS_MOUNTH)
+
+	priceDaysComplete := r.Complete * r.Porcentile * DAYS_YEAR
+
+	return (priceDaysComplete / priceToDays) * r.PorcentileNow()
 }
 
-func (r *Resumen) PriceDayNow() float64 {
-	today := time.Now()
-	daysOfMountsToday := float64(today.Month()) * DAYS_MOUNTH
-	dayToday := today.YearDay()
-
-	return r.PayMountNow() / (daysOfMountsToday - float64(dayToday))
-}
-
-func (r *Resumen) Resumen(salary float64) []string {
-	info := make([]string, 5)
+func (r *Resumen) Resumen() []string {
+	info := make([]string, 4)
 
 	info[0] = r.Type
 	info[1] = r.Name
-	info[2] = fmt.Sprintf("%%%.2f", (r.PriceDayNow()/240)*100)
-	info[3] = fmt.Sprintf("$%.2f", r.PriceDayNow())
-	info[4] = fmt.Sprintf("%.2f", r.PayMountNow())
+	info[2] = fmt.Sprintf("%.2f%%", r.PorcentileNow()*100)
+	info[3] = fmt.Sprintf("%.2f%%", r.PorcentileComplete()*100)
 
 	return info
 }
