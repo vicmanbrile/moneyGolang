@@ -10,10 +10,20 @@ import (
 )
 
 var (
-	DAYS_WEEK    float64 = 10
+	DAY          float64 = 1
+	DAYS_WEEK    float64 = DAY * 10
 	DAYS_MOUNTH  float64 = DAYS_WEEK * 3
+	MOUNT        float64 = 1
 	MOUNTHS_YEAR float64 = 12
 	DAYS_YEAR    float64 = DAYS_MOUNTH * MOUNTHS_YEAR
+)
+
+func ToPriceInDays(Money float64, Average float64) PriceInDays {
+	return PriceInDays(Money / Average)
+}
+
+var (
+	Today DayOfYear = DayOfYear(time.Now().YearDay())
 )
 
 type DayOfYear float64
@@ -26,13 +36,6 @@ func (dfy DayOfYear) Week() float64 {
 	return math.Ceil(float64(dfy) / DAYS_WEEK)
 }
 
-var (
-	Today DayOfYear = DayOfYear(time.Now().YearDay())
-)
-
-type Expenses struct {
-	Creditos []Credits `json:"credit"`
-}
 type Credits struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
@@ -68,28 +71,30 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 		case "Debt":
 			{
 				r.MountInit = Today.Mounth()
-				r.MountsToPay = 1
+				r.MountsToPay = MOUNT
 			}
 		case "Percentile":
 			{
-				r.MountInit = 1
-				r.MountsToPay = 12
+				r.MountInit = MOUNT
+				r.MountsToPay = MOUNTHS_YEAR
 
 				{
-					var ProcintileAll = c.Datails.Optionals.Percentage + 1
+					var Procintile = c.Datails.Optionals.Percentage * DAYS_YEAR
 
-					r.Price = PriceInDays(ProcintileAll * Average)
+					c.Datails.Precing = Procintile * Average
 				}
 			}
 		case "Suscription":
 			{
+				r.MountInit = float64(c.Date.Mount)
 				switch c.Datails.Optionals.Suscription {
 				case "yearly":
-					r.Price = PriceInDays(c.Datails.Precing)
-
+					{
+						r.MountsToPay = MOUNTHS_YEAR
+					}
 				case "monthly":
 					{
-						r.Price = PriceInDays(c.Datails.Precing * MOUNTHS_YEAR)
+						r.MountsToPay = MOUNT
 					}
 				}
 			}
@@ -98,17 +103,22 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 
 	/* Definimos el precio por dias de los creditos */
 	if c.Datails.Interes > 0 {
-		c.Datails.Precing *= c.Datails.Interes + 1
+		c.Datails.Precing *= (c.Datails.Interes + 1)
 	}
 
 	r.Price = ToPriceInDays(c.Datails.Precing, Average)
-	r.Paid = PriceInDays(c.Spent / Average)
+
+	if c.Spent == 0 {
+		r.Paid = 0
+	} else {
+		r.Paid = ToPriceInDays(c.Spent, Average)
+	}
 
 	return
 }
 
-func ToPriceInDays(Money float64, Average float64) (PD PriceInDays) {
-	return PriceInDays(Money / Average)
+type Expenses struct {
+	Creditos []Credits `json:"credit"`
 }
 
 func (e *Expenses) CalcPerfil(Average float64) AllExpenses {
@@ -173,18 +183,9 @@ func (e *AllExpenses) PrintTable() {
 	table.Render()
 }
 
-type Calculator interface {
-	CalculatorResumen(Average float64) Resumen
-}
-
-func CalculatorResumen(w Calculator, Average float64) Resumen {
-	return w.CalculatorResumen(Average)
-}
-
 type PriceInDays float64
 
 func (PID *PriceInDays) Week() {
-
 }
 
 type Resumen struct {
@@ -198,31 +199,29 @@ type Resumen struct {
 
 func (r *Resumen) PorcentileNow() (porcentaje float64) {
 
-	// Dias del año
-	PriceInDays := (float64(r.Price) / 360) * DAYS_YEAR
+	// Porcentaje a pagar por mes
+	PorcentajeForMount := 1 / r.MountsToPay
 
-	// Porcenje a pagar por mes del total
-	PorcentileForMount := ((13 - r.MountsToPay) / MOUNTHS_YEAR)
-
-	MountNow := float64(time.Now().Month())
-	Geting := MountNow - r.MountInit + 1
+	// Meses en total para ahora
+	Geting := (Today.Mounth() + 1) - r.MountInit
 	if Geting <= 0 {
 		Geting = 1
 	}
-	// --
-	PorcentileSaved := PorcentileForMount * Geting
 
-	formula := (PriceInDays * PorcentileSaved) / (MountNow * DAYS_MOUNTH)
+	// --
+	PorcentileSaved := PorcentajeForMount * Geting
+
+	formula := (float64(r.Price) * PorcentileSaved) / (Today.Mounth() * DAYS_MOUNTH)
 
 	return formula
 }
 
 func (r *Resumen) PorcentileComplete() float64 {
-	priceToDays := r.PorcentileNow() * (float64(time.Now().Month()) * DAYS_MOUNTH)
-
-	priceDaysComplete := r.Paid * (r.Price / r.Paid) * PriceInDays(DAYS_YEAR)
-
-	return (float64(priceDaysComplete) / priceToDays) * r.PorcentileNow()
+	if r.Paid == 0 {
+		return 0
+	} else {
+		return (float64(r.Paid) / (Today.Mounth() * DAYS_MOUNTH)) / r.PorcentileNow()
+	}
 }
 
 func (r *Resumen) Resumen() []string {

@@ -11,7 +11,7 @@ import (
 func main() {
 	app := Init()
 
-	D := app.Expenses.CalcPerfil(app.Wallets.Average)
+	D := app.Wallets.Expenses.CalcPerfil(app.Wallets.Average)
 	D.PrintTable()
 
 	fmt.Println(app.Free())

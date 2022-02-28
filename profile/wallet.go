@@ -1,9 +1,12 @@
 package profile
 
+import "github.com/vicmanbrile/moneyGolang/profile/expenses"
+
 type Wallet struct {
-	Cash    float64 `json:"cash"`
-	Banking float64 `json:"banking"`
-	Average float64 `json:"average"`
+	Cash     float64           `json:"cash"`
+	Banking  float64           `json:"banking"`
+	Average  float64           `json:"average"`
+	Expenses expenses.Expenses `json:"expenses"`
 }
 
 func (w *Wallet) Total() float64 {

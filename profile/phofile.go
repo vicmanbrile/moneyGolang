@@ -3,19 +3,16 @@ package profile
 import (
 	"fmt"
 	"time"
-
-	"github.com/vicmanbrile/moneyGolang/profile/expenses"
 )
 
 type Perfil struct {
-	Expenses  expenses.Expenses `json:"expenses"`
-	Registers Registers         `json:"registers"`
-	Wallets   Wallet            `json:"wallets"`
+	Registers Registers `json:"registers"`
+	Wallets   Wallet    `json:"wallets"`
 }
 
 func (p *Perfil) Free() string {
 
-	porcentile := p.Expenses.CalcPerfil(p.Wallets.Average)
+	porcentile := p.Wallets.Expenses.CalcPerfil(p.Wallets.Average)
 
 	diasPagadas := p.Registers.Budgets().Entries / p.Wallets.Average
 
