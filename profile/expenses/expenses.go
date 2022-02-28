@@ -2,6 +2,7 @@ package expenses
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -9,47 +10,114 @@ import (
 )
 
 var (
-	DAYS_MOUNTH  float64 = 30
+	DAYS_WEEK    float64 = 10
+	DAYS_MOUNTH  float64 = DAYS_WEEK * 3
 	MOUNTHS_YEAR float64 = 12
 	DAYS_YEAR    float64 = DAYS_MOUNTH * MOUNTHS_YEAR
 )
 
-type Calculator interface {
-	CalculatorResumen(Average float64) Resumen
+type DayOfYear float64
+
+func (dfy DayOfYear) Mounth() float64 {
+	return math.Ceil(float64(dfy) / DAYS_MOUNTH)
 }
 
-func CalculatorResumen(w Calculator, Average float64) Resumen {
-	return w.CalculatorResumen(Average)
+func (dfy DayOfYear) Week() float64 {
+	return math.Ceil(float64(dfy) / DAYS_WEEK)
 }
+
+var (
+	Today DayOfYear = DayOfYear(time.Now().YearDay())
+)
 
 type Expenses struct {
-	Creditos     []Credit      `json:"credit"`
-	Deudas       []Debt        `json:"debts"`
-	Suscriptions []Suscription `json:"suscriptions"`
-	Percentiles  []Percentile  `json:"percentile"`
+	Creditos []Credits `json:"credit"`
+}
+type Credits struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Date struct {
+		Mount int `json:"mount"`
+		Year  int `json:"year"`
+	} `json:"date"`
+	Datails struct {
+		Interes   float64 `json:"interes"`
+		Precing   float64 `json:"precing"`
+		Mensualy  int     `json:"mensualy"`
+		Optionals struct {
+			Percentage  float64 `json:"porcentile"`
+			Suscription string  `json:"suscription"`
+		} `json:"optionals"`
+	} `json:"datails"`
+	Spent float64 `json:"spent"`
+}
+
+func (c *Credits) Calculator(Average float64) (r Resumen) {
+	r = Resumen{
+		Name: c.Name,
+		Type: c.Type,
+	}
+
+	{ /* Establecer los tiempos de pago */
+		switch c.Type {
+		case "Credit":
+			{
+				r.MountInit = float64(c.Date.Mount)
+				r.MountsToPay = float64(c.Datails.Mensualy)
+			}
+		case "Debt":
+			{
+				r.MountInit = Today.Mounth()
+				r.MountsToPay = 1
+			}
+		case "Percentile":
+			{
+				r.MountInit = 1
+				r.MountsToPay = 12
+
+				{
+					var ProcintileAll = c.Datails.Optionals.Percentage + 1
+
+					r.Price = PriceInDays(ProcintileAll * Average)
+				}
+			}
+		case "Suscription":
+			{
+				switch c.Datails.Optionals.Suscription {
+				case "yearly":
+					r.Price = PriceInDays(c.Datails.Precing)
+
+				case "monthly":
+					{
+						r.Price = PriceInDays(c.Datails.Precing * MOUNTHS_YEAR)
+					}
+				}
+			}
+		}
+	}
+
+	/* Definimos el precio por dias de los creditos */
+	if c.Datails.Interes > 0 {
+		c.Datails.Precing *= c.Datails.Interes + 1
+	}
+
+	r.Price = ToPriceInDays(c.Datails.Precing, Average)
+	r.Paid = PriceInDays(c.Spent / Average)
+
+	return
+}
+
+func ToPriceInDays(Money float64, Average float64) (PD PriceInDays) {
+	return PriceInDays(Money / Average)
 }
 
 func (e *Expenses) CalcPerfil(Average float64) AllExpenses {
-	var Todos []Resumen
+	var AE = AllExpenses{}
 
 	for _, value := range e.Creditos {
-		Todos = append(Todos, *value.CalculatorResumen(Average))
-	}
-	for _, value := range e.Deudas {
-		Todos = append(Todos, *value.CalculatorResumen(Average))
+		AE.ToDoExpenses = append(AE.ToDoExpenses, value.Calculator(Average))
 	}
 
-	for _, value := range e.Suscriptions {
-		Todos = append(Todos, *value.CalculatorResumen(Average))
-	}
-
-	for _, value := range e.Percentiles {
-		Todos = append(Todos, *value.CalculatorResumen(Average))
-	}
-
-	var AE AllExpenses
-
-	AE.ToDoExpenses = Todos
 	return AE
 }
 
@@ -105,12 +173,25 @@ func (e *AllExpenses) PrintTable() {
 	table.Render()
 }
 
+type Calculator interface {
+	CalculatorResumen(Average float64) Resumen
+}
+
+func CalculatorResumen(w Calculator, Average float64) Resumen {
+	return w.CalculatorResumen(Average)
+}
+
+type PriceInDays float64
+
+func (PID *PriceInDays) Week() {
+
+}
+
 type Resumen struct {
-	PriceYear   float64
-	Porcentile  float64
-	Complete    float64
 	Name        string
 	Type        string
+	Price       PriceInDays
+	Paid        PriceInDays
 	MountInit   float64
 	MountsToPay float64
 }
@@ -118,7 +199,7 @@ type Resumen struct {
 func (r *Resumen) PorcentileNow() (porcentaje float64) {
 
 	// Dias del año
-	PriceInDays := r.Porcentile * DAYS_YEAR
+	PriceInDays := (float64(r.Price) / 360) * DAYS_YEAR
 
 	// Porcenje a pagar por mes del total
 	PorcentileForMount := ((13 - r.MountsToPay) / MOUNTHS_YEAR)
@@ -139,9 +220,9 @@ func (r *Resumen) PorcentileNow() (porcentaje float64) {
 func (r *Resumen) PorcentileComplete() float64 {
 	priceToDays := r.PorcentileNow() * (float64(time.Now().Month()) * DAYS_MOUNTH)
 
-	priceDaysComplete := r.Complete * r.Porcentile * DAYS_YEAR
+	priceDaysComplete := r.Paid * (r.Price / r.Paid) * PriceInDays(DAYS_YEAR)
 
-	return (priceDaysComplete / priceToDays) * r.PorcentileNow()
+	return (float64(priceDaysComplete) / priceToDays) * r.PorcentileNow()
 }
 
 func (r *Resumen) Resumen() []string {

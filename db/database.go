@@ -26,7 +26,7 @@ func GetData() []byte {
 
 	var result bson.M
 
-	objectId, err := primitive.ObjectIDFromHex("61e8612465b31c1ad2246d21")
+	objectId, err := primitive.ObjectIDFromHex("6215c7dc38821f527b019d3e")
 	if err != nil {
 		log.Println("Invalid id")
 	}
