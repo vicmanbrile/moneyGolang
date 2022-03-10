@@ -1,12 +1,8 @@
 package expenses
 
 import (
-	"fmt"
 	"math"
-	"os"
 	"time"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 var (
@@ -65,18 +61,15 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 		switch c.Type {
 		case "Credit":
 			{
-				r.MountInit = float64(c.Date.Mount)
-				r.MountsToPay = float64(c.Datails.Mensualy)
+				r.MonthFinish = float64(c.Datails.Mensualy)
 			}
 		case "Debt":
 			{
-				r.MountInit = Today.Mounth()
-				r.MountsToPay = MOUNT
+				r.MonthFinish = Today.Mounth()
 			}
 		case "Percentile":
 			{
-				r.MountInit = MOUNT
-				r.MountsToPay = MOUNTHS_YEAR
+				r.MonthFinish = MOUNTHS_YEAR
 
 				{
 					var Procintile = c.Datails.Optionals.Percentage * DAYS_YEAR
@@ -86,15 +79,15 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 			}
 		case "Suscription":
 			{
-				r.MountInit = float64(c.Date.Mount)
+				r.MonthFinish = MOUNTHS_YEAR
 				switch c.Datails.Optionals.Suscription {
 				case "yearly":
 					{
-						r.MountsToPay = MOUNTHS_YEAR
+						return
 					}
 				case "monthly":
 					{
-						r.MountsToPay = MOUNT
+						c.Datails.Precing *= MOUNTHS_YEAR
 					}
 				}
 			}
@@ -135,102 +128,84 @@ type AllExpenses struct {
 	ToDoExpenses []Resumen
 }
 
-func (e *AllExpenses) PriceDays() float64 {
-	var result float64
+func (a *AllExpenses) PorcentileForMouthsP() float64 {
+	var total float64
 
-	for _, value := range e.ToDoExpenses {
-		result += value.PorcentileComplete()
+	for _, value := range a.ToDoExpenses {
+		total += value.PorcentileForMouthsP()
 	}
 
-	return result
+	return total
 }
 
-func (e *AllExpenses) FaltaMount() float64 {
-	var result float64
+func (a *AllExpenses) PorcentileForMouthsF() float64 {
+	var total float64
 
-	for _, value := range e.ToDoExpenses {
-		result += value.PorcentileNow()
+	for _, value := range a.ToDoExpenses {
+		total += value.PorcentileForMouthsF()
 	}
 
-	return result
+	return total
 }
 
-func (e *AllExpenses) PrintTable() {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetBorder(false)
+func (a *AllExpenses) PorcentileMoutnsPastFuture() float64 {
+	var total float64
 
-	table.SetHeader([]string{"Grupo", "Descripcion", "Porcentaje", "Complete"})
-
-	info := make([][]string, 0)
-	{
-		for _, value := range e.ToDoExpenses {
-			d := value.Resumen()
-			info = append(info, d)
-		}
+	for _, value := range a.ToDoExpenses {
+		total += value.PorcentileMoutnsPastFuture()
 	}
 
-	table.SetFooter([]string{
-		"",
-		"Total:",
-		fmt.Sprintf("%.2f%%", e.FaltaMount()*100),
-		fmt.Sprintf("%.2f%%", e.PriceDays()*100),
-	})
-
-	for _, v := range info {
-		table.Append(v)
-	}
-
-	table.Render()
+	return total
 }
 
 type PriceInDays float64
-
-func (PID *PriceInDays) Week() {
-}
 
 type Resumen struct {
 	Name        string
 	Type        string
 	Price       PriceInDays
 	Paid        PriceInDays
-	MountInit   float64
-	MountsToPay float64
+	MonthFinish float64
 }
 
-func (r *Resumen) PorcentileNow() (porcentaje float64) {
+func (r *Resumen) PorcentileForYear() float64 {
+	return float64(r.Price) / DAYS_YEAR
+}
 
-	// Porcentaje a pagar por mes
-	PorcentajeForMount := 1 / r.MountsToPay
+func (r *Resumen) MountsPast() float64 {
+	return Today.Mounth() - 1.00
+}
 
-	// Meses en total para ahora
-	Geting := (Today.Mounth() + 1) - r.MountInit
-	if Geting <= 0 {
-		Geting = 1
+func (r *Resumen) MountsFuture() float64 {
+	mounts := r.MonthFinish - Today.Mounth()
+	if mounts == 0 {
+		mounts = 1
 	}
 
-	// --
-	PorcentileSaved := PorcentajeForMount * Geting
-
-	formula := (float64(r.Price) * PorcentileSaved) / (Today.Mounth() * DAYS_MOUNTH)
-
-	return formula
+	return mounts
 }
 
-func (r *Resumen) PorcentileComplete() float64 {
-	if r.Paid == 0 {
-		return 0
-	} else {
-		return (float64(r.Paid) / (Today.Mounth() * DAYS_MOUNTH)) / r.PorcentileNow()
-	}
+func (r *Resumen) PorcentileForMouthsP() (past float64) {
+	DaysPast := DAYS_MOUNTH * r.MountsPast()
+
+	past = float64(r.Paid) / DaysPast
+
+	return
 }
 
-func (r *Resumen) Resumen() []string {
-	info := make([]string, 4)
+func (r *Resumen) PorcentileForMouthsF() (future float64) {
+	DaysFuture := DAYS_MOUNTH * r.MountsFuture()
+	future = float64(r.Price-r.Paid) / DaysFuture
 
-	info[0] = r.Type
-	info[1] = r.Name
-	info[2] = fmt.Sprintf("%.2f%%", r.PorcentileNow()*100)
-	info[3] = fmt.Sprintf("%.2f%%", r.PorcentileComplete()*100)
+	return
+}
 
-	return info
+func (r *Resumen) PorcentileMoutnsPastFuture() float64 {
+	Past := r.PorcentileForMouthsP()
+	Future := r.PorcentileForMouthsF()
+
+	MPast := r.MountsPast()
+	MFuture := 1.00
+
+	return ((Past * MPast) + (Future * MFuture)) / (MPast + MFuture)
 }

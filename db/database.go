@@ -3,9 +3,11 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/vicmanbrile/moneyGolang/profile"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,4 +44,14 @@ func GetData() []byte {
 	}
 
 	return jsonData
+}
+
+func Init() (d *profile.Perfil) {
+	err := json.Unmarshal(GetData(), &d)
+
+	if err != nil {
+		fmt.Printf("Error al convertir a JSON: %v", err)
+	}
+
+	return
 }

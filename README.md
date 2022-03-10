@@ -5,3 +5,8 @@
 ```
 
 "Suscription" "Percentile" "Debt" "Credit"
+
+
+### Inecesario
+PorcentileNow 
+PorcentileComplete
