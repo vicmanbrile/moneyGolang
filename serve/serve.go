@@ -12,9 +12,6 @@ import (
 type AllCredits struct {
 	PageTitle string
 	Todos     expenses.AllExpenses
-	Past      float64
-	Future    float64
-	PF        float64
 }
 
 func ShowCredits(w http.ResponseWriter, r *http.Request) {
@@ -26,15 +23,15 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 		Todos:     extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
 	}
 
-	data.Past = data.Todos.PorcentileForMouthsP()
-	data.Future = data.Todos.PorcentileForMouthsF()
-	data.PF = data.Todos.PorcentileMoutnsPastFuture()
-
 	tml.Execute(w, data)
 }
 
 func GetData() {
 	http.HandleFunc("/", ShowCredits)
+
+	fs := http.FileServer(http.Dir("./assets"))
+
+	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	fmt.Println("Server listing... http:localhost:8080")
 	http.ListenAndServe(":8080", nil)

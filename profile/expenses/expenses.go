@@ -107,6 +107,7 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 		r.Paid = ToPriceInDays(c.Spent, Average)
 	}
 
+	r.Resta = r.Price - r.Paid
 	return
 }
 
@@ -128,36 +129,6 @@ type AllExpenses struct {
 	ToDoExpenses []Resumen
 }
 
-func (a *AllExpenses) PorcentileForMouthsP() float64 {
-	var total float64
-
-	for _, value := range a.ToDoExpenses {
-		total += value.PorcentileForMouthsP()
-	}
-
-	return total
-}
-
-func (a *AllExpenses) PorcentileForMouthsF() float64 {
-	var total float64
-
-	for _, value := range a.ToDoExpenses {
-		total += value.PorcentileForMouthsF()
-	}
-
-	return total
-}
-
-func (a *AllExpenses) PorcentileMoutnsPastFuture() float64 {
-	var total float64
-
-	for _, value := range a.ToDoExpenses {
-		total += value.PorcentileMoutnsPastFuture()
-	}
-
-	return total
-}
-
 type PriceInDays float64
 
 type Resumen struct {
@@ -165,47 +136,10 @@ type Resumen struct {
 	Type        string
 	Price       PriceInDays
 	Paid        PriceInDays
+	Resta       PriceInDays
 	MonthFinish float64
 }
 
 func (r *Resumen) PorcentileForYear() float64 {
 	return float64(r.Price) / DAYS_YEAR
-}
-
-func (r *Resumen) MountsPast() float64 {
-	return Today.Mounth() - 1.00
-}
-
-func (r *Resumen) MountsFuture() float64 {
-	mounts := r.MonthFinish - Today.Mounth()
-	if mounts == 0 {
-		mounts = 1
-	}
-
-	return mounts
-}
-
-func (r *Resumen) PorcentileForMouthsP() (past float64) {
-	DaysPast := DAYS_MOUNTH * r.MountsPast()
-
-	past = float64(r.Paid) / DaysPast
-
-	return
-}
-
-func (r *Resumen) PorcentileForMouthsF() (future float64) {
-	DaysFuture := DAYS_MOUNTH * r.MountsFuture()
-	future = float64(r.Price-r.Paid) / DaysFuture
-
-	return
-}
-
-func (r *Resumen) PorcentileMoutnsPastFuture() float64 {
-	Past := r.PorcentileForMouthsP()
-	Future := r.PorcentileForMouthsF()
-
-	MPast := r.MountsPast()
-	MFuture := 1.00
-
-	return ((Past * MPast) + (Future * MFuture)) / (MPast + MFuture)
 }

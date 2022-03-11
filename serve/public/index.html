@@ -4,16 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money</title>
-    <style>
-      .table-debs{
-          text-align: center;
-      }
-    </style>
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <script src="/assets/styles.js"></script>
+    <title>{{.PageTitle}}</title>
 </head>
 <body>
-    <h1>{{.PageTitle}}</h1>
-    
     <table class="table-debs">
       <tr>
         <th>Name</th>
@@ -21,12 +17,8 @@
         <th>Price</th>
         <th>Paid</th>
         <th>MonthFinish</th>
-        <th>PorcentileForMouthsP</th>
-        <th>PorcentileForMouthsF</th>
+        <th>Resta</th>
         <th>PorcentileForYear</th>
-        <th>MountsPast</th>
-        <th>MountsFuture</th>
-        <th>PorcentileMoutnsPastFuture</th>
       </tr>
         {{range .Todos.ToDoExpenses}}
           <tr>
@@ -35,20 +27,10 @@
             <td>{{.Price}}</td>
             <td>{{.Paid}}</td>
             <td>{{.MonthFinish}}</td>
-            <td>{{.PorcentileForMouthsP}}</td>
-            <td>{{.PorcentileForMouthsF}}</td>
+            <td>{{.Resta}}</td>
             <td>{{.PorcentileForYear}}</td>
-            <td>{{.MountsPast}}</td>
-            <td>{{.MountsFuture}}</td>
-            <td>{{.PorcentileMoutnsPastFuture}}</td>
           </tr>
         {{end}}
       </table>
-
-      <div>
-        <h2>Pasado: {{.Past}}</h2>
-        <h2>Futuro: {{.Future}} Calcular por semana</h2>
-        <h2>Pasado con futuro {{.PF}} lo que equivale tener pagado los dos</h2>
-      </div>
 </body>
 </html>
