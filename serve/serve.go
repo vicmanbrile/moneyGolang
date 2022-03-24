@@ -26,7 +26,7 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 	tml.Execute(w, data)
 }
 
-func GetData() {
+func GoServer() {
 	http.HandleFunc("/", ShowCredits)
 
 	fs := http.FileServer(http.Dir("./assets"))
