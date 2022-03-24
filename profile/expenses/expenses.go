@@ -1,36 +1,6 @@
 package expenses
 
-import (
-	"math"
-	"time"
-)
-
-var (
-	DAY          float64 = 1
-	DAYS_WEEK    float64 = DAY * 10
-	DAYS_MOUNTH  float64 = DAYS_WEEK * 3
-	MOUNT        float64 = 1
-	MOUNTHS_YEAR float64 = 12
-	DAYS_YEAR    float64 = DAYS_MOUNTH * MOUNTHS_YEAR
-)
-
-func ToPriceInDays(Money float64, Average float64) PriceInDays {
-	return PriceInDays(Money / Average)
-}
-
-var (
-	Today DayOfYear = DayOfYear(time.Now().YearDay())
-)
-
-type DayOfYear float64
-
-func (dfy DayOfYear) Mounth() float64 {
-	return math.Ceil(float64(dfy) / DAYS_MOUNTH)
-}
-
-func (dfy DayOfYear) Week() float64 {
-	return math.Ceil(float64(dfy) / DAYS_WEEK)
-}
+import "github.com/vicmanbrile/moneyGolang/profile/expenses/dates"
 
 type Credits struct {
 	Name string `json:"name"`
@@ -65,21 +35,21 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 			}
 		case "Debt":
 			{
-				r.MonthFinish = Today.Mounth()
+				r.MonthFinish = dates.Today.Mounth()
 			}
 		case "Percentile":
 			{
-				r.MonthFinish = MOUNTHS_YEAR
+				r.MonthFinish = dates.MOUNTHS_YEAR
 
 				{
-					var Procintile = c.Datails.Optionals.Percentage * DAYS_YEAR
+					var Procintile = c.Datails.Optionals.Percentage * dates.DAYS_YEAR
 
 					c.Datails.Precing = Procintile * Average
 				}
 			}
 		case "Suscription":
 			{
-				r.MonthFinish = MOUNTHS_YEAR
+				r.MonthFinish = dates.MOUNTHS_YEAR
 				switch c.Datails.Optionals.Suscription {
 				case "yearly":
 					{
@@ -87,7 +57,7 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 					}
 				case "monthly":
 					{
-						c.Datails.Precing *= MOUNTHS_YEAR
+						c.Datails.Precing *= dates.MOUNTHS_YEAR
 					}
 				}
 			}
@@ -99,12 +69,12 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 		c.Datails.Precing *= (c.Datails.Interes + 1)
 	}
 
-	r.Price = ToPriceInDays(c.Datails.Precing, Average)
+	r.Price = dates.ToPriceInDays(c.Datails.Precing, Average)
 
 	if c.Spent == 0 {
 		r.Paid = 0
 	} else {
-		r.Paid = ToPriceInDays(c.Spent, Average)
+		r.Paid = dates.ToPriceInDays(c.Spent, Average)
 	}
 
 	r.Resta = r.Price - r.Paid
@@ -129,17 +99,15 @@ type AllExpenses struct {
 	ToDoExpenses []Resumen
 }
 
-type PriceInDays float64
-
 type Resumen struct {
 	Name        string
 	Type        string
-	Price       PriceInDays
-	Paid        PriceInDays
-	Resta       PriceInDays
+	Price       dates.PriceInDays
+	Paid        dates.PriceInDays
+	Resta       dates.PriceInDays
 	MonthFinish float64
 }
 
 func (r *Resumen) PorcentileForYear() float64 {
-	return float64(r.Price) / DAYS_YEAR
+	return float64(r.Price) / dates.DAYS_YEAR
 }
