@@ -36,8 +36,3 @@ func GoServer() {
 	fmt.Println("Server listing... http:localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
-
-type Todo struct {
-	Title string
-	Done  bool
-}
