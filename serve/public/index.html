@@ -17,8 +17,7 @@
         <th>Price</th>
         <th>Paid</th>
         <th>MonthFinish</th>
-        <th>Resta</th>
-        <th>PorcentileForYear</th>
+        <th>Subtrac</th>
       </tr>
         {{range .Todos.ToDoExpenses}}
           <tr>
@@ -27,10 +26,11 @@
             <td>{{.Price}}</td>
             <td>{{.Paid}}</td>
             <td>{{.MonthFinish}}</td>
-            <td>{{.Resta}}</td>
-            <td>{{.PorcentileForYear}}</td>
+            <td>{{.Subtrac}}</td>
           </tr>
         {{end}}
       </table>
+
+      <p>{{.Money}}</p>
 </body>
 </html>

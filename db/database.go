@@ -14,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetData() []byte {
+func GetDataFindOne(id, coll string) []byte {
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -24,11 +24,11 @@ func GetData() []byte {
 		log.Fatal(err)
 	}
 
-	collect := client.Database("moneyGolang").Collection("profile")
+	collect := client.Database("moneyGolang").Collection(coll)
 
 	var result bson.M
 
-	objectId, err := primitive.ObjectIDFromHex("6215c7dc38821f527b019d3e")
+	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Println("Invalid id")
 	}
@@ -46,8 +46,8 @@ func GetData() []byte {
 	return jsonData
 }
 
-func Init() (d *profile.Perfil) {
-	err := json.Unmarshal(GetData(), &d)
+func GetDataProfile(id, coll string) (d *profile.Perfil) {
+	err := json.Unmarshal(GetDataFindOne(id, coll), &d)
 
 	if err != nil {
 		fmt.Printf("Error al convertir a JSON: %v", err)

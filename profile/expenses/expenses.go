@@ -1,6 +1,10 @@
 package expenses
 
-import "github.com/vicmanbrile/moneyGolang/profile/expenses/dates"
+import (
+	"time"
+
+	"github.com/vicmanbrile/moneyGolang/dates"
+)
 
 type Credits struct {
 	Name string `json:"name"`
@@ -77,7 +81,7 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 		r.Paid = dates.ToPriceInDays(c.Spent, Average)
 	}
 
-	r.Resta = r.Price - r.Paid
+	r.Subtrac = r.Price - r.Paid
 	return
 }
 
@@ -104,8 +108,12 @@ type Resumen struct {
 	Type        string
 	Price       dates.PriceInDays
 	Paid        dates.PriceInDays
-	Resta       dates.PriceInDays
+	Subtrac     dates.PriceInDays
 	MonthFinish float64
+
+	// Tipos nuevos para el calendario
+	DateInit   time.Time
+	DateFinish time.Time
 }
 
 func (r *Resumen) PorcentileForYear() float64 {
