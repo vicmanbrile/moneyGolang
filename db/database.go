@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -38,19 +37,19 @@ func GetDataFindOne(id, coll string) []byte {
 		panic(err)
 	}
 
-	jsonData, err := json.MarshalIndent(result, "", "    ")
+	bsonData, err := bson.Marshal(result)
 	if err != nil {
 		panic(err)
 	}
 
-	return jsonData
+	return bsonData
 }
 
 func GetDataProfile(id, coll string) (d *profile.Perfil) {
-	err := json.Unmarshal(GetDataFindOne(id, coll), &d)
+	err := bson.Unmarshal(GetDataFindOne(id, coll), &d)
 
 	if err != nil {
-		fmt.Printf("Error al convertir a JSON: %v", err)
+		fmt.Printf("Error al convertir a BSON: %v", err)
 	}
 
 	return

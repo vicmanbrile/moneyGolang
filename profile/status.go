@@ -2,9 +2,9 @@ package profile
 
 type Registers struct {
 	Entries []struct {
-		Week  float64 `json:"week"`
-		Money float64 `json:"money"`
-	} `json:"entries"`
+		Week  float64 `bson:"week"`
+		Money float64 `bson:"money"`
+	} `bson:"entries"`
 }
 
 func (r *Registers) Budgets() (Bdgt Budget) {

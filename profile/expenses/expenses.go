@@ -7,22 +7,22 @@ import (
 )
 
 type Credits struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name string `bson:"name"`
+	Type string `bson:"type"`
 	Date struct {
-		Mount int `json:"mount"`
-		Year  int `json:"year"`
-	} `json:"date"`
+		Mount int `bson:"mount"`
+		Year  int `bson:"year"`
+	} `bson:"date"`
 	Datails struct {
-		Interes   float64 `json:"interes"`
-		Precing   float64 `json:"precing"`
-		Mensualy  int     `json:"mensualy"`
+		Interes   float64 `bson:"interes"`
+		Precing   float64 `bson:"precing"`
+		Mensualy  int     `bson:"mensualy"`
 		Optionals struct {
-			Percentage  float64 `json:"porcentile"`
-			Suscription string  `json:"suscription"`
-		} `json:"optionals"`
-	} `json:"datails"`
-	Spent float64 `json:"spent"`
+			Percentage  float64 `bson:"porcentile"`
+			Suscription string  `bson:"suscription"`
+		} `bson:"optionals"`
+	} `bson:"datails"`
+	Spent float64 `bson:"spent"`
 }
 
 func (c *Credits) Calculator(Average float64) (r Resumen) {
@@ -86,7 +86,7 @@ func (c *Credits) Calculator(Average float64) (r Resumen) {
 }
 
 type Expenses struct {
-	Creditos []Credits `json:"credit"`
+	Creditos []Credits `bson:"credit"`
 }
 
 func (e *Expenses) CalcPerfil(Average float64) AllExpenses {

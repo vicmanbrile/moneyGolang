@@ -1,6 +1,6 @@
 package profile
 
 type Perfil struct {
-	Registers Registers `json:"registers"`
-	Wallets   Wallet    `json:"wallets"`
+	Registers Registers `bson:"registers"`
+	Wallets   Wallet    `bson:"wallets"`
 }
