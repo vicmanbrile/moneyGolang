@@ -89,18 +89,12 @@ type Expenses struct {
 	Creditos []Credits `bson:"credit"`
 }
 
-func (e *Expenses) CalcPerfil(Average float64) AllExpenses {
-	var AE = AllExpenses{}
-
+func (e *Expenses) CalcPerfil(Average float64) (TR []Resumen) {
 	for _, value := range e.Creditos {
-		AE.ToDoExpenses = append(AE.ToDoExpenses, value.Calculator(Average))
+		TR = append(TR, value.Calculator(Average))
 	}
 
-	return AE
-}
-
-type AllExpenses struct {
-	ToDoExpenses []Resumen
+	return
 }
 
 type Resumen struct {

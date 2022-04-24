@@ -1,8 +1,8 @@
 package serve
 
 import (
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/vicmanbrile/moneyGolang/db"
@@ -10,32 +10,64 @@ import (
 )
 
 type AllCredits struct {
-	PageTitle string
-	Todos     expenses.AllExpenses
-	Money     float64
+	NameProfile string             `json:"profile"`
+	Credits     []expenses.Resumen `json:"credits"`
 }
 
+type ErrorNotFound struct {
+	Type  int   `json:"type"`
+	Error error `json:"error"`
+}
+
+/*
+	ShowCredits() es un Handler que responde con un AllCredis
+*/
+
 func ShowCredits(w http.ResponseWriter, r *http.Request) {
-	tml := template.Must(template.ParseFiles("serve/public/index.html"))
 
-	extractData := db.GetDataProfile("6215c7dc38821f527b019d3e", "profile")
+	extractData, err := db.GetDataProfile("6215c7dc38821f527b019d3e", "profile") // Extraemos con un Id y la Collecction de un Perfil
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 
-	data := AllCredits{
-		PageTitle: "Mis Creditos",
-		Todos:     extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
-		Money:     extractData.Registers.Budgets().Entries,
+		Error := ErrorNotFound{
+			Type:  http.StatusNotFound,
+			Error: err,
+		}
+
+		json.NewEncoder(w).Encode(Error)
 	}
 
-	tml.Execute(w, data)
+	data := AllCredits{
+		NameProfile: "vicmanbrile",
+		Credits:     extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
+	}
+
+	{
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(data)
+	}
+
 }
 
 func GoServer() {
-	http.HandleFunc("/", ShowCredits)
+	PORT := ":8080"
 
-	fs := http.FileServer(http.Dir("./assets"))
+	ApiSubdomain := "api.localhost"
+	AssetsSubdomain := "assets.localhost"
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	{ // API Rest
+		http.HandleFunc(ApiSubdomain+"/", ShowCredits)
+	}
 
-	fmt.Println("Server listing... http:localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	{ // Assets Request
+		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./assets"))))
+	}
+
+	{
+		http.HandleFunc("/", Home)
+	}
+
+	fmt.Println("Server listing... http:localhost" + PORT)
+	http.ListenAndServe(PORT, nil)
 }
