@@ -2,8 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
 
 	"github.com/vicmanbrile/moneyGolang/profile"
@@ -13,14 +11,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDataFindOne(id, coll string) []byte {
+func GetDataFindOne(id, coll string) ([]byte, error) {
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, ClientOptions)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	collect := client.Database("moneyGolang").Collection(coll)
@@ -29,27 +27,32 @@ func GetDataFindOne(id, coll string) []byte {
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		log.Println("Invalid id")
+		return nil, err
 	}
 
 	err = collect.FindOne(ctx, bson.D{{Key: "_id", Value: objectId}}).Decode(&result)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	bsonData, err := bson.Marshal(result)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return bsonData
+	return bsonData, nil
 }
 
-func GetDataProfile(id, coll string) (d *profile.Perfil) {
-	err := bson.Unmarshal(GetDataFindOne(id, coll), &d)
-
+func GetDataProfile(id, coll string) (d *profile.Perfil, err error) {
+	// Se extrae la información de GetDataFindOne() para comprovar si hay error o no se encontro el archivo
+	profile, err := GetDataFindOne(id, coll)
 	if err != nil {
-		fmt.Printf("Error al convertir a BSON: %v", err)
+		return nil, err
+	}
+
+	err = bson.Unmarshal(profile, &d)
+	if err != nil {
+		return nil, err
 	}
 
 	return
