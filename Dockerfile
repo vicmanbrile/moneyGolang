@@ -14,6 +14,6 @@ RUN go build -o /moneyGolang
 
 EXPOSE 8080
 
-ENV MONGODB_CONNECTION="mongodb+srv://vicmanbrile:06EpI5YiGzdRaoyD@aplicacioneconomico.4zrhb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+ENV MONGODB_CONNECTION="$MONGODB_CONNECTION"
 
 CMD ["/moneyGolang"]
