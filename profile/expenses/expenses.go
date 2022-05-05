@@ -1,9 +1,8 @@
 package expenses
 
 import (
-	"time"
-
 	"github.com/vicmanbrile/moneyGolang/dates"
+	"github.com/vicmanbrile/moneyGolang/serve/schemas"
 )
 
 type Credits struct {
@@ -25,8 +24,8 @@ type Credits struct {
 	Spent float64 `bson:"spent"`
 }
 
-func (c *Credits) Calculator(Average float64) (r Resumen) {
-	r = Resumen{
+func (c *Credits) Calculator(Average float64) (r schemas.Resumen) {
+	r = schemas.Resumen{
 		Name: c.Name,
 		Type: c.Type,
 	}
@@ -89,27 +88,10 @@ type Expenses struct {
 	Creditos []Credits `bson:"credit"`
 }
 
-func (e *Expenses) CalcPerfil(Average float64) (TR []Resumen) {
+func (e *Expenses) CalcPerfil(Average float64) (TR []schemas.Resumen) {
 	for _, value := range e.Creditos {
 		TR = append(TR, value.Calculator(Average))
 	}
 
 	return
-}
-
-type Resumen struct {
-	Name        string
-	Type        string
-	Price       dates.PriceInDays
-	Paid        dates.PriceInDays
-	Subtrac     dates.PriceInDays
-	MonthFinish float64
-
-	// Tipos nuevos para el calendario
-	DateInit   time.Time
-	DateFinish time.Time
-}
-
-func (r *Resumen) PorcentileForYear() float64 {
-	return float64(r.Price) / dates.DAYS_YEAR
 }

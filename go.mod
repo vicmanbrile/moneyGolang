@@ -2,13 +2,10 @@ module github.com/vicmanbrile/moneyGolang
 
 go 1.17
 
-require github.com/olekukonko/tablewriter v0.0.5
-
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
@@ -19,7 +16,4 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 )
 
-require (
-	github.com/gocarina/gocsv v0.0.0-20211203214250-4735fba0c1d9
-	go.mongodb.org/mongo-driver v1.8.2
-)
+require go.mongodb.org/mongo-driver v1.8.2

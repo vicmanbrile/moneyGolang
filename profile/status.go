@@ -7,14 +7,10 @@ type Registers struct {
 	} `bson:"entries"`
 }
 
-func (r *Registers) Budgets() (Bdgt Budget) {
+func (r *Registers) Budgets() (Bdgt float64) {
 	for _, value := range r.Entries {
-		Bdgt.Entries += value.Money
+		Bdgt += value.Money
 	}
 
 	return
-}
-
-type Budget struct {
-	Entries float64
 }
