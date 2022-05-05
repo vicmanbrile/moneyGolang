@@ -6,12 +6,13 @@ import (
 	"net/http"
 
 	"github.com/vicmanbrile/moneyGolang/db"
-	"github.com/vicmanbrile/moneyGolang/profile/expenses"
+	"github.com/vicmanbrile/moneyGolang/serve/schemas"
 )
 
 type AllCredits struct {
-	NameProfile string             `json:"profile"`
-	Credits     []expenses.Resumen `json:"credits"`
+	NameProfile string            `json:"profile"`
+	Credits     []schemas.Resumen `json:"credits"`
+	MoneyInDays float64           `json:"money"`
 }
 
 type ErrorNotFound struct {
@@ -40,10 +41,12 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 	data := AllCredits{
 		NameProfile: "vicmanbrile",
 		Credits:     extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
+		MoneyInDays: extractData.Registers.Budgets(),
 	}
 
 	{
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(w).Encode(data)
 	}
@@ -62,10 +65,6 @@ func GoServer() {
 
 	{ // Assets Request
 		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./assets"))))
-	}
-
-	{
-		http.HandleFunc("/", Home)
 	}
 
 	fmt.Println("Server listing... http:localhost" + PORT)
