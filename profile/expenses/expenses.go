@@ -1,6 +1,8 @@
 package expenses
 
 import (
+	"time"
+
 	"github.com/vicmanbrile/moneyGolang/dates"
 	"github.com/vicmanbrile/moneyGolang/serve/schemas"
 )
@@ -13,13 +15,9 @@ type Credits struct {
 		Year  int `bson:"year"`
 	} `bson:"date"`
 	Datails struct {
-		Interes   float64 `bson:"interes"`
-		Precing   float64 `bson:"precing"`
-		Mensualy  int     `bson:"mensualy"`
-		Optionals struct {
-			Percentage  float64 `bson:"porcentile"`
-			Suscription string  `bson:"suscription"`
-		} `bson:"optionals"`
+		Interes  float64 `bson:"interes"`
+		Precing  float64 `bson:"precing"`
+		Mensualy int     `bson:"mensualy"`
 	} `bson:"datails"`
 	Spent float64 `bson:"spent"`
 }
@@ -27,44 +25,21 @@ type Credits struct {
 func (c *Credits) Calculator(Average float64) (r schemas.Resumen) {
 	r = schemas.Resumen{
 		Name: c.Name,
-		Type: c.Type,
 	}
 
-	{ /* Establecer los tiempos de pago */
-		switch c.Type {
-		case "Credit":
-			{
-				r.MonthFinish = float64(c.Datails.Mensualy)
-			}
-		case "Debt":
-			{
-				r.MonthFinish = dates.Today.Mounth()
-			}
-		case "Percentile":
-			{
-				r.MonthFinish = dates.MOUNTHS_YEAR
+	{ // Establecer fecha de inicio y final
 
-				{
-					var Procintile = c.Datails.Optionals.Percentage * dates.DAYS_YEAR
-
-					c.Datails.Precing = Procintile * Average
-				}
-			}
-		case "Suscription":
-			{
-				r.MonthFinish = dates.MOUNTHS_YEAR
-				switch c.Datails.Optionals.Suscription {
-				case "yearly":
-					{
-						return
-					}
-				case "monthly":
-					{
-						c.Datails.Precing *= dates.MOUNTHS_YEAR
-					}
-				}
-			}
+		{ // Inicio
+			r.DateInit = time.Date(c.Date.Year, time.Month(c.Date.Mount), 1, 0, 0, 0, 0, time.UTC)
 		}
+
+		{ // Final
+
+			DaysMount := dates.DayOfYear((c.Datails.Mensualy * int(dates.DAYS_MOUNTH))).ToFraction()
+
+			r.DateFinish = r.DateInit.AddDate(int(DaysMount.Years), int(DaysMount.Mounts), int(DaysMount.Days))
+		}
+
 	}
 
 	/* Definimos el precio por dias de los creditos */
