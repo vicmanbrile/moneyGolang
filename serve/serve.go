@@ -1,60 +1,14 @@
 package serve
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"github.com/vicmanbrile/moneyGolang/db"
 	"github.com/vicmanbrile/moneyGolang/serve/auth"
-	"github.com/vicmanbrile/moneyGolang/serve/schemas"
+	"github.com/vicmanbrile/moneyGolang/serve/handlers"
 )
-
-type AllCredits struct {
-	NameProfile string            `json:"profile"`
-	Credits     []schemas.Resumen `json:"credits"`
-	MoneyInDays float64           `json:"money"`
-}
-
-type ErrorNotFound struct {
-	Type  int   `json:"type"`
-	Error error `json:"error"`
-}
-
-/*
-	ShowCredits() es un Handler que responde con un AllCredis
-*/
-
-func ShowCredits(w http.ResponseWriter, r *http.Request) {
-
-	extractData, err := db.GetDataProfile("6215c7dc38821f527b019d3e", "profile") // Extraemos con un Id y la Collecction de un Perfil
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-
-		Error := ErrorNotFound{
-			Type:  http.StatusNotFound,
-			Error: err,
-		}
-
-		json.NewEncoder(w).Encode(Error)
-	}
-
-	data := AllCredits{
-		NameProfile: "vicmanbrile",
-		Credits:     extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
-		MoneyInDays: extractData.Registers.Budgets(),
-	}
-
-	{
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(http.StatusAccepted)
-		json.NewEncoder(w).Encode(data)
-	}
-
-}
 
 func GoServer() {
 	PORT := ":8080"
@@ -64,7 +18,7 @@ func GoServer() {
 	Auth0Subdomain := "auth.localhost"
 
 	{ // API Rest
-		http.HandleFunc(ApiSubdomain+"/", ShowCredits)
+		http.HandleFunc(ApiSubdomain+"/", handlers.ShowCredits)
 	}
 
 	{ // Auth0
@@ -95,7 +49,11 @@ func GoServer() {
 	}
 
 	{ // Assets Request
-		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./assets"))))
+		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./serve/assets"))))
+	}
+
+	{
+		http.HandleFunc("/", handlers.DocHandler)
 	}
 
 	fmt.Println("Server listing... http:localhost" + PORT)
