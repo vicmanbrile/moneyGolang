@@ -6,8 +6,8 @@ import (
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"github.com/vicmanbrile/moneyGolang/serve/auth"
 	"github.com/vicmanbrile/moneyGolang/serve/handlers"
+	"github.com/vicmanbrile/moneyGolang/serve/middlewares/auth"
 )
 
 func GoServer() {
