@@ -10,8 +10,7 @@ var (
 	DAYS_WEEK    float64 = DAY * 10
 	DAYS_MOUNTH  float64 = DAYS_WEEK * 3
 	DAYS_YEAR    float64 = DAYS_MOUNTH * MOUNTHS_YEAR
-	MOUNT        float64 = 1
-	MOUNTHS_YEAR float64 = MOUNT * 12
+	MOUNTHS_YEAR float64 = 1 * 12
 )
 
 type PriceInDays float64
@@ -24,7 +23,7 @@ var (
 	Today DayOfYear = DayOfYear(time.Now().YearDay())
 )
 
-type DayOfYear float64
+type DayOfYear int
 
 func (dfy DayOfYear) Mounth() float64 {
 	return math.Ceil(float64(dfy) / DAYS_MOUNTH)
