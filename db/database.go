@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/vicmanbrile/moneyGolang/profile"
+	profile "github.com/vicmanbrile/moneyGolang/app"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,9 +43,9 @@ func GetDataFindOne(id, coll string) ([]byte, error) {
 	return bsonData, nil
 }
 
-func GetDataProfile(id, coll string) (d *profile.Perfil, err error) {
+func GetDataProfile(Prfl Profile) (d *profile.Perfil, err error) {
 	// Se extrae la información de GetDataFindOne() para comprovar si hay error o no se encontro el archivo
-	profile, err := GetDataFindOne(id, coll)
+	profile, err := GetDataFindOne(Prfl.ID, "profile")
 	if err != nil {
 		return nil, err
 	}

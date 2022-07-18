@@ -3,7 +3,7 @@ package schemas
 import (
 	"time"
 
-	"github.com/vicmanbrile/moneyGolang/dates"
+	"github.com/vicmanbrile/moneyGolang/app/dates"
 )
 
 type Resumen struct {

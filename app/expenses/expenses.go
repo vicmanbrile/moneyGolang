@@ -3,8 +3,8 @@ package expenses
 import (
 	"time"
 
-	"github.com/vicmanbrile/moneyGolang/dates"
-	"github.com/vicmanbrile/moneyGolang/serve/schemas"
+	"github.com/vicmanbrile/moneyGolang/app/dates"
+	"github.com/vicmanbrile/moneyGolang/schemas"
 )
 
 type Credits struct {

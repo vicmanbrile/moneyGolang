@@ -1,6 +1,6 @@
 package profile
 
-import "github.com/vicmanbrile/moneyGolang/profile/expenses"
+import "github.com/vicmanbrile/moneyGolang/app/expenses"
 
 type Wallet struct {
 	Cash     float64           `bson:"cash"`

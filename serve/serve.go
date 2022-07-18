@@ -4,24 +4,30 @@ import (
 	"fmt"
 	"net/http"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
-	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"github.com/vicmanbrile/moneyGolang/serve/handlers"
-	"github.com/vicmanbrile/moneyGolang/serve/middlewares/auth"
+	"github.com/vicmanbrile/moneyGolang/middlewares"
+	"github.com/vicmanbrile/moneyGolang/router"
 )
 
-func GoServer() {
-	PORT := ":8080"
+type Handle func(http.ResponseWriter, *http.Request)
+type Server struct {
+	Port   string
+	Router *router.Router
+}
 
-	ApiSubdomain := "api.localhost"
-	AssetsSubdomain := "assets.localhost"
-	Auth0Subdomain := "auth.localhost"
-
-	{ // API Rest
-		http.HandleFunc(ApiSubdomain+"/", handlers.ShowCredits)
+func NuevoServidor(port string) *Server {
+	return &Server{
+		Port:   port,
+		Router: router.NuevoRouter(),
 	}
+}
 
-	{ // Auth0
+func (s *Server) GoServer() {
+	AssetsSubdomain := "assets.localhost"
+
+	http.Handle("/", s.Router)
+	// Auth0Subdomain := "auth.localhost"
+
+	/*{ // Auth0
 		http.HandleFunc(Auth0Subdomain+"/public", auth.AllAcces)
 
 		http.Handle(Auth0Subdomain+"/privade", auth.EnsureValidTolken()(
@@ -46,16 +52,30 @@ func GoServer() {
 				w.Write([]byte(`{"message":"Hola a un punto publico! Necesitas acceder para ver esto."}`))
 			}),
 		))
-	}
+	}*/
 
 	{ // Assets Request
-		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./serve/assets"))))
+		http.Handle(AssetsSubdomain+"/", http.StripPrefix("/", http.FileServer(http.Dir("./assets"))))
+	}
+
+	fmt.Println("Server listing... http:localhost" + s.Port)
+	http.ListenAndServe(s.Port, nil)
+}
+
+func (s *Server) Handle(path string, handle http.HandlerFunc, method string, middleware ...middlewares.Middleware) http.HandlerFunc {
+
+	RV := &router.RuteValidation{
+		HDF:          handle,
+		Middlerwares: middleware,
 	}
 
 	{
-		http.HandleFunc("/", handlers.DocHandler)
+		if s.Router.Rules[path] == nil {
+			s.Router.Rules[path] = make(map[string]router.RuteValidation)
+		}
+
+		s.Router.Rules[path][method] = *RV
 	}
 
-	fmt.Println("Server listing... http:localhost" + PORT)
-	http.ListenAndServe(PORT, nil)
+	return handle
 }
