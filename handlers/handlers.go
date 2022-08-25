@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/vicmanbrile/moneyGolang/db"
 	"github.com/vicmanbrile/moneyGolang/schemas"
 	"github.com/vicmanbrile/moneyGolang/templates"
@@ -32,6 +33,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowCredits(w http.ResponseWriter, r *http.Request) {
+
+	chi.URLParam(r, "")
 
 	Cookie, _ := r.Cookie("Profile")
 
@@ -65,13 +68,6 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 
 		Home.Execute(w, data)
 
-		/*{
-			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.WriteHeader(http.StatusAccepted)
-			json.NewEncoder(w).Encode(data)
-		}*/
-
 	}
 
 }
@@ -93,10 +89,17 @@ func SessionForm(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	fmt.Fprintf(w, "Acceses acepted!\n")
+
+}
+
+func SessionFormGet(w http.ResponseWriter, r *http.Request) {
+
 	FormTemplate := template.New("Session Form")
 	FormTemplate.Parse(templates.FormSession)
 
 	FormTemplate.Execute(w, nil)
+
 }
 
 // func AddCredit(w http.ResponseWriter, r *http.Request) {}

@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
+	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
 	"github.com/vicmanbrile/moneyGolang/handlers"
-	"github.com/vicmanbrile/moneyGolang/middlewares"
-	"github.com/vicmanbrile/moneyGolang/serve"
 )
 
 func main() {
@@ -15,16 +16,27 @@ func main() {
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
-	SER := serve.NuevoServidor(":8080")
+	r := chi.NewRouter()
 
-	SER.Handle("/", handlers.Home, "GET")
+	r.Use(middleware.Logger)
 
-	SER.Handle("/credits", handlers.ShowCredits, "GET", middlewares.Logging())
-	SER.Handle("/credits", handlers.ShowCredits, "POST", middlewares.Logging())
+	r.Get("/", handlers.Home)
 
-	SER.Handle("/session", handlers.SessionForm, "POST", middlewares.Logging())
-	SER.Handle("/session", handlers.SessionForm, "GET", middlewares.Logging())
+	r.Get("/credits", handlers.ShowCredits)
 
-	SER.GoServer()
+	r.Post("/user", handlers.SessionForm)
+	r.Get("/user", handlers.SessionFormGet)
+
+	http.ListenAndServe(":8080", r)
+
+	/*
+
+		SER := serve.NuevoServidor(":8080")
+
+		SER.Handle("/credits", handlers.ShowCredits, "POST", middlewares.Logging())
+
+		SER.GoServer()
+
+	*/
 
 }

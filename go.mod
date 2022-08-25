@@ -19,6 +19,7 @@ require (
 
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.0.1
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.9.1
 )
