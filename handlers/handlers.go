@@ -50,11 +50,15 @@ type AllCredits struct {
 	Credits      []schemas.Resumen
 	MoneyInDays  float64
 	StyleRecurse template.URL
+	Success      bool
 }
 
 func ShowCredits(w http.ResponseWriter, r *http.Request) {
 
-	chi.URLParam(r, "")
+	err := r.ParseForm()
+	if err != nil {
+		return
+	}
 
 	Cookie, _ := r.Cookie("Profile")
 
@@ -80,9 +84,16 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 			Credits:      extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
 			MoneyInDays:  extractData.Registers.Budgets(),
 			StyleRecurse: template.URL("http://localhost:8080/assets/main.css"),
+			Success:      false,
 		}
 
-		Home, _ := template.ParseFiles("templates/show-credits.gohtml")
+		files := []string{
+			"./templates/main.gohtml",
+			"./templates/show-credits.gohtml",
+			"./templates/componets/navegation-bar.gohtml",
+		}
+
+		Home, _ := template.ParseFiles(files...)
 
 		Home.Execute(w, data)
 
@@ -109,7 +120,13 @@ func SessionForm(w http.ResponseWriter, r *http.Request) {
 
 func SessionFormGet(w http.ResponseWriter, r *http.Request) {
 
-	FormTemplate, err := template.ParseFiles("templates/form-session.gohtml")
+	files := []string{
+		"./templates/main.gohtml",
+		"./templates/form-session.gohtml",
+		"./templates/componets/navegation-bar.gohtml",
+	}
+
+	FormTemplate, err := template.ParseFiles(files...)
 
 	if err != nil {
 		fmt.Println(err)
