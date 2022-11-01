@@ -1,20 +1,13 @@
 package db
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
-type Profile struct {
-	ID        primitive.ObjectID
-	Deposits  primitive.ObjectID
-	Shoppings primitive.ObjectID
-	Wallet    primitive.ObjectID
-}
-
 type Deposits struct {
 	YearDay  int
 	Deposits float64
 }
 
-func (d *Deposits) Read() {}
+func (d *Deposits) Read() {
+
+}
 
 func (d *Deposits) Update(up struct {
 	YearDayNow int

@@ -3,6 +3,7 @@ module github.com/vicmanbrile/moneyGolang
 go 1.17
 
 require (
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
@@ -20,6 +21,7 @@ require (
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.0.1
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/render v1.0.2
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.9.1
 )

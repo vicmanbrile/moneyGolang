@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/vicmanbrile/moneyGolang/db"
 	"github.com/vicmanbrile/moneyGolang/schemas"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ErrorNotFound struct {
@@ -62,12 +63,13 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 
 	Cookie, _ := r.Cookie("Profile")
 
-	User := db.Profile{
-		ID: Cookie.Value,
+	objectId, err := primitive.ObjectIDFromHex(Cookie.Value)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	{
-		extractData, err := db.GetDataProfile(User) // Extraemos con un Id y la Collecction de un Perfil
+		extractData, err := db.GetDataProfile(objectId) // Extraemos con un Id y la Collecction de un Perfil
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 

@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/vicmanbrile/moneyGolang/middlewares"
+	"github.com/vicmanbrile/moneyGolang/serve/handlers/middlewares"
 )
 
 type RuteValidation struct {

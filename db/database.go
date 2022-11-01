@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDataFindOne(id, coll string) ([]byte, error) {
+func GetDataFindOne(id primitive.ObjectID, coll string) ([]byte, error) {
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -25,12 +25,7 @@ func GetDataFindOne(id, coll string) ([]byte, error) {
 
 	var result bson.M
 
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	err = collect.FindOne(ctx, bson.D{{Key: "_id", Value: objectId}}).Decode(&result)
+	err = collect.FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +38,9 @@ func GetDataFindOne(id, coll string) ([]byte, error) {
 	return bsonData, nil
 }
 
-func GetDataProfile(Prfl Profile) (d *profile.Perfil, err error) {
+func GetDataProfile(Prfl primitive.ObjectID) (d *profile.Perfil, err error) {
 	// Se extrae la información de GetDataFindOne() para comprovar si hay error o no se encontro el archivo
-	profile, err := GetDataFindOne(Prfl.ID, "profile")
+	profile, err := GetDataFindOne(Prfl, "profile")
 	if err != nil {
 		return nil, err
 	}

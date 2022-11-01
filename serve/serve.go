@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vicmanbrile/moneyGolang/middlewares"
-	"github.com/vicmanbrile/moneyGolang/router"
+	"github.com/vicmanbrile/moneyGolang/serve/handlers/middlewares"
+	"github.com/vicmanbrile/moneyGolang/serve/handlers/router"
 )
 
 type Handle func(http.ResponseWriter, *http.Request)
@@ -62,11 +62,11 @@ func (s *Server) GoServer() {
 	http.ListenAndServe(s.Port, nil)
 }
 
-func (s *Server) Handle(path string, handle http.HandlerFunc, method string, middleware ...middlewares.Middleware) http.HandlerFunc {
+func (s *Server) Handle(path string, handle http.HandlerFunc, method string, midd ...middlewares.Middleware) http.HandlerFunc {
 
 	RV := &router.RuteValidation{
 		HDF:          handle,
-		Middlerwares: middleware,
+		Middlerwares: midd,
 	}
 
 	{
