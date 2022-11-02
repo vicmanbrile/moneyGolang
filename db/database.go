@@ -2,30 +2,46 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
 
-	profile "github.com/vicmanbrile/moneyGolang/app"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDataFindOne(id primitive.ObjectID, coll string) ([]byte, error) {
+type MongoConnection struct {
+	Client           *mongo.Client
+	ContexWithCancel context.Context
+	ContexCancel     context.CancelFunc
+}
+
+func EstablishingConnection() (mc *MongoConnection) {
+
+	mc = &MongoConnection{}
+
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
-	client, err := mongo.Connect(ctx, ClientOptions)
-	if err != nil {
-		return nil, err
-	}
+	mc.ContexWithCancel, mc.ContexCancel = context.WithCancel(context.Background())
 
-	collect := client.Database("moneyGolang").Collection(coll)
+	mc.Client, _ = mongo.Connect(mc.ContexWithCancel, ClientOptions)
+
+	return
+
+}
+
+func (mc *MongoConnection) CancelConection() {
+	mc.ContexCancel()
+}
+
+func (mc *MongoConnection) FindOne(key primitive.ObjectID, collection string) ([]byte, error) {
+
+	collect := mc.Client.Database("moneyGolang").Collection(collection)
 
 	var result bson.M
 
-	err = collect.FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&result)
+	err := collect.FindOne(mc.ContexWithCancel, bson.D{{Key: "_id", Value: key}}).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -35,20 +51,7 @@ func GetDataFindOne(id primitive.ObjectID, coll string) ([]byte, error) {
 		return nil, err
 	}
 
+	fmt.Println(string(bsonData))
+
 	return bsonData, nil
-}
-
-func GetDataProfile(Prfl primitive.ObjectID) (d *profile.Perfil, err error) {
-	// Se extrae la información de GetDataFindOne() para comprovar si hay error o no se encontro el archivo
-	profile, err := GetDataFindOne(Prfl, "profile")
-	if err != nil {
-		return nil, err
-	}
-
-	err = bson.Unmarshal(profile, &d)
-	if err != nil {
-		return nil, err
-	}
-
-	return
 }
