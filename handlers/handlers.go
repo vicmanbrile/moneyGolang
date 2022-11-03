@@ -55,57 +55,62 @@ type AllCredits struct {
 	Success      bool
 }
 
-func ShowCredits(w http.ResponseWriter, r *http.Request) {
+func ShowCredits(ClientDB *db.MongoConnection) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
-
-	Cookie, _ := r.Cookie("Profile")
-
-	objectId, err := primitive.ObjectIDFromHex(Cookie.Value)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	find := &db.User{
-		ID: objectId,
-	}
-
-	{
-		extractData := find.ReadProfile() // Extraemos con un Id y la Collecction de un Perfil
+		err := r.ParseForm()
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 
-			Error := ErrorNotFound{
-				Type:  http.StatusNotFound,
-				Error: err,
+		// Cookie, _ := r.Cookie("Profile")
+
+		objectId, err := primitive.ObjectIDFromHex("6215c7dc38821f527b019d3e")
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		find := &db.User{
+			ID: objectId,
+		}
+
+		{
+			extractData := find.ReadProfile(ClientDB) // Extraemos con un id y la Collecction de un Perfil
+			if err != nil {
+				w.WriteHeader(http.StatusNotFound)
+				Error := ErrorNotFound{
+					Type:  http.StatusNotFound,
+					Error: err,
+				}
+
+				err := json.NewEncoder(w).Encode(Error)
+				if err != nil {
+					return
+				}
 			}
 
-			json.NewEncoder(w).Encode(Error)
+			fmt.Println(extractData)
+
+			data := AllCredits{
+				NameProfile:  "vicmanbrile",
+				Credits:      extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
+				MoneyInDays:  extractData.Budgets(),
+				StyleRecurse: template.URL("http://localhost:8080/assets/main.css"),
+				Success:      false,
+			}
+
+			files := []string{
+				"./templates/main.gohtml",
+				"./templates/show-credits.gohtml",
+				"./templates/componets/navegation-bar.gohtml",
+			}
+
+			Home, _ := template.ParseFiles(files...)
+
+			Home.Execute(w, data)
+
 		}
-
-		data := AllCredits{
-			NameProfile:  "vicmanbrile",
-			Credits:      extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
-			MoneyInDays:  extractData.Budgets(),
-			StyleRecurse: template.URL("http://localhost:8080/assets/main.css"),
-			Success:      false,
-		}
-
-		files := []string{
-			"./templates/main.gohtml",
-			"./templates/show-credits.gohtml",
-			"./templates/componets/navegation-bar.gohtml",
-		}
-
-		Home, _ := template.ParseFiles(files...)
-
-		Home.Execute(w, data)
-
 	}
-
 }
 
 func SessionForm(w http.ResponseWriter, r *http.Request) {
@@ -125,7 +130,7 @@ func SessionForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func SessionFormGet(w http.ResponseWriter, r *http.Request) {
+func SessionFormGet(w http.ResponseWriter, _ *http.Request) {
 
 	files := []string{
 		"./templates/main.gohtml",
@@ -143,43 +148,49 @@ func SessionFormGet(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func AveragePost(w http.ResponseWriter, r *http.Request) {
+func AveragePost(ClientDB *db.MongoConnection) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		insert := &db.User{}
 
-	insert := &db.User{}
+		ds := application.Deposits{
+			YearDay:  200,
+			Deposits: 18000,
+		}
 
-	ds := application.Deposits{
-		YearDay:  200,
-		Deposits: 18000,
+		insert.InsertDeposit(ClientDB, ds)
+
+		fmt.Fprintf(w, "Hello World!")
 	}
-
-	insert.InsertDeposit(mg.ClientDB, ds)
-
-	fmt.Fprintf(w, "Hello World!")
 }
 
-func AverageGet(w http.ResponseWriter, r *http.Request) {
+func AverageGet(ClientDB *db.MongoConnection) http.HandlerFunc {
 
-	id, err := primitive.ObjectIDFromHex("6362b84b70a43aee546d8745")
-	if err != nil {
-		fmt.Println(err)
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := primitive.ObjectIDFromHex("6362b84b70a43aee546d8745")
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		find := &db.User{
+			ID: id,
+		}
+
+		depost := find.ReadDeposit(ClientDB)
+
+		rest := &schemas.MostrarDeposits{
+			Average:  depost.Average(),
+			YearDay:  depost.YearDay,
+			Deposits: depost.Deposits,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		w.WriteHeader(http.StatusCreated)
+
+		err = json.NewEncoder(w).Encode(rest)
+		if err != nil {
+			return
+		}
 	}
-
-	find := &db.User{
-		ID: id,
-	}
-
-	depost := find.ReadDeposit(mg.ClientDB)
-
-	rest := &schemas.MostrarDeposits{
-		Average:  depost.Average(),
-		YearDay:  depost.YearDay,
-		Deposits: depost.Deposits,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(rest)
 
 }

@@ -20,12 +20,12 @@ func (mg *MoneyGolang) ListenAndServe(port string) {
 
 	mg.Router.Use(middleware.Logger)
 
-	mg.Router.Get("/", handlers.ShowCredits)
+	mg.Router.Get("/", handlers.ShowCredits(mg.ClientDB))
 
 	handlers.FileServer(mg.Router)
 
-	mg.Router.Post("/average", handlers.AveragePost)
-	mg.Router.Get("/average", handlers.AverageGet)
+	mg.Router.Post("/average", handlers.AveragePost(mg.ClientDB))
+	mg.Router.Get("/average", handlers.AverageGet(mg.ClientDB))
 
 	mg.Router.Post("/user", handlers.SessionForm)
 	mg.Router.Get("/user", handlers.SessionFormGet)

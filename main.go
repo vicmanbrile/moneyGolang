@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Port string = "8000"
+	Port string = "8080"
 )
 
 func main() {
@@ -17,14 +17,14 @@ func main() {
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
-	money_app := &MoneyGolang{}
+	moneyApp := &MoneyGolang{}
 
-	mongo_connection := db.NewMongoConnection()
+	mongoConnection := db.NewMongoConnection()
 
-	defer mongo_connection.CancelConection()
+	defer mongoConnection.CancelConection()
 
-	money_app.ClientDB = mongo_connection
+	moneyApp.ClientDB = mongoConnection
 
-	money_app.ListenAndServe(Port)
+	moneyApp.ListenAndServe(Port)
 
 }
