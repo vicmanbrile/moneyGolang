@@ -12,32 +12,36 @@ import (
 )
 
 type MongoConnection struct {
-	Client           *mongo.Client
+	MongoClient      *mongo.Client
 	ContexWithCancel context.Context
-	ContexCancel     context.CancelFunc
+	FuncCancel       context.CancelFunc
 }
 
-func EstablishingConnection() (mc *MongoConnection) {
-
-	mc = &MongoConnection{}
+func NewMongoConnection() *MongoConnection {
+	mc := &MongoConnection{}
+	var err error
 
 	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
 
-	mc.ContexWithCancel, mc.ContexCancel = context.WithCancel(context.Background())
+	mc.ContexWithCancel, mc.FuncCancel = context.WithCancel(context.Background())
 
-	mc.Client, _ = mongo.Connect(mc.ContexWithCancel, ClientOptions)
+	mc.MongoClient, err = mongo.Connect(mc.ContexWithCancel, ClientOptions)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	return
-
+	return mc
 }
 
 func (mc *MongoConnection) CancelConection() {
-	mc.ContexCancel()
+	mc.FuncCancel()
 }
 
 func (mc *MongoConnection) FindOne(key primitive.ObjectID, collection string) ([]byte, error) {
 
-	collect := mc.Client.Database("moneyGolang").Collection(collection)
+	dbs := mc.MongoClient.Database("moneyGolang")
+
+	collect := dbs.Collection(collection)
 
 	var result bson.M
 
@@ -51,7 +55,16 @@ func (mc *MongoConnection) FindOne(key primitive.ObjectID, collection string) ([
 		return nil, err
 	}
 
-	fmt.Println(string(bsonData))
-
 	return bsonData, nil
+}
+
+func (mc *MongoConnection) InsetOne(document bson.D, collection string) {
+	coll := mc.MongoClient.Database("moneyGolang").Collection(collection)
+
+	result, err := coll.InsertOne(context.TODO(), document)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 }

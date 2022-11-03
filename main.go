@@ -4,6 +4,11 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	"github.com/vicmanbrile/moneyGolang/db"
+)
+
+var (
+	Port string = "8000"
 )
 
 func main() {
@@ -12,12 +17,14 @@ func main() {
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
-	//Revisar si existen las colecciones : Deposits, Shoppings, Suscriptions, Wallet
+	money_app := &MoneyGolang{}
 
-	MG := &MoneyGolang{}
+	mongo_connection := db.NewMongoConnection()
 
-	defer MG.CloseDatabase()
+	defer mongo_connection.CancelConection()
 
-	MG.ListenAndServe()
+	money_app.ClientDB = mongo_connection
+
+	money_app.ListenAndServe(Port)
 
 }

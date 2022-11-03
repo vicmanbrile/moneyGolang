@@ -9,8 +9,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/vicmanbrile/moneyGolang/application"
 	"github.com/vicmanbrile/moneyGolang/db"
-	"github.com/vicmanbrile/moneyGolang/schemas"
+	"github.com/vicmanbrile/moneyGolang/handlers/schemas"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -29,7 +30,7 @@ func FileServer(r chi.Router) {
 	}
 
 	if path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
 		path += "/"
 	}
 	path += "*"
@@ -68,8 +69,12 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	find := &db.User{
+		ID: objectId,
+	}
+
 	{
-		extractData, err := db.GetDataProfile(objectId) // Extraemos con un Id y la Collecction de un Perfil
+		extractData := find.ReadProfile() // Extraemos con un Id y la Collecction de un Perfil
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -84,7 +89,7 @@ func ShowCredits(w http.ResponseWriter, r *http.Request) {
 		data := AllCredits{
 			NameProfile:  "vicmanbrile",
 			Credits:      extractData.Wallets.Expenses.CalcPerfil(extractData.Wallets.Average),
-			MoneyInDays:  extractData.Registers.Budgets(),
+			MoneyInDays:  extractData.Budgets(),
 			StyleRecurse: template.URL("http://localhost:8080/assets/main.css"),
 			Success:      false,
 		}
@@ -138,4 +143,43 @@ func SessionFormGet(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func AddCredit(w http.ResponseWriter, r *http.Request) {}
+func AveragePost(w http.ResponseWriter, r *http.Request) {
+
+	insert := &db.User{}
+
+	ds := application.Deposits{
+		YearDay:  200,
+		Deposits: 18000,
+	}
+
+	insert.InsertDeposit(mg.ClientDB, ds)
+
+	fmt.Fprintf(w, "Hello World!")
+}
+
+func AverageGet(w http.ResponseWriter, r *http.Request) {
+
+	id, err := primitive.ObjectIDFromHex("6362b84b70a43aee546d8745")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	find := &db.User{
+		ID: id,
+	}
+
+	depost := find.ReadDeposit(mg.ClientDB)
+
+	rest := &schemas.MostrarDeposits{
+		Average:  depost.Average(),
+		YearDay:  depost.YearDay,
+		Deposits: depost.Deposits,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(rest)
+
+}

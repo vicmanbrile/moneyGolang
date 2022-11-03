@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 
+	"github.com/vicmanbrile/moneyGolang/application"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -11,54 +12,54 @@ type User struct {
 	ID primitive.ObjectID
 }
 
-func (u *User) ReadDeposit(mc *MongoConnection) (rest *Deposits) {
+/*
+	Profile
+*/
+
+// Read
+func (u *User) ReadProfile(mc *MongoConnection) (rest *application.Perfil) {
+
+	bsonData, err := mc.FindOne(u.ID, "profile")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = bson.Unmarshal(bsonData, &rest)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return rest
+}
+
+/*
+	Deposits
+*/
+// Read
+func (u *User) ReadDeposit(mc *MongoConnection) (rest *application.Deposits) {
+
 	bsonData, err := mc.FindOne(u.ID, "deposits")
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	err = bson.Unmarshal(bsonData, rest)
+	err = bson.Unmarshal(bsonData, &rest)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	return
+	return rest
 }
 
-type Deposits struct {
-	YearDay  int     `bson:"year_day"`
-	Deposits float64 `bson:"deposits"`
-}
+// Write
+func (u *User) InsertDeposit(mc *MongoConnection, d application.Deposits) {
 
-func (d *Deposits) Update(up struct {
-	YearDayNow int
-	NewDeposit float64
-}) {
-	d.YearDay += up.YearDayNow - d.YearDay
-	d.Deposits += up.NewDeposit
-}
-
-func (d *Deposits) Average() float64 {
-	return d.Deposits / float64(d.YearDay)
-}
-
-type Shoppings struct {
-	Description string
-	Precing     float64
-	Interes     float64
-	Date        struct {
-		Mount int
-		Year  int
+	doc := bson.D{
+		{Key: "year_day", Value: d.YearDay},
+		{Key: "deposits", Value: d.Deposits},
 	}
-	Mensualy int
-	Spent    float64
-}
 
-type Wallet struct {
-	Cash    float64
-	Bank    float64
-	Savings float64
-}
+	mc.InsetOne(doc, "deposits")
 
-type Suscriptions struct{}
+}

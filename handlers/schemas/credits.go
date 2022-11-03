@@ -3,7 +3,7 @@ package schemas
 import (
 	"time"
 
-	"github.com/vicmanbrile/moneyGolang/app/dates"
+	"github.com/vicmanbrile/moneyGolang/application/dates"
 )
 
 type Resumen struct {
@@ -15,4 +15,10 @@ type Resumen struct {
 	// Tipos nuevos para el calendario
 	DateInit   time.Time `json:"date_init"`
 	DateFinish time.Time `json:"date_finish"`
+}
+
+type MostrarDeposits struct {
+	Average  float64 `json:"average"`
+	YearDay  int     `json:"year_day"`
+	Deposits float64 `json:"deposits"`
 }
