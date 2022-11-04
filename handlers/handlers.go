@@ -8,9 +8,12 @@ import (
 	"strings"
 	"time"
 
+	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/go-chi/chi/v5"
 	"github.com/vicmanbrile/moneyGolang/application"
 	"github.com/vicmanbrile/moneyGolang/db"
+	"github.com/vicmanbrile/moneyGolang/handlers/middlewares/auth"
 	"github.com/vicmanbrile/moneyGolang/handlers/schemas"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -18,6 +21,13 @@ import (
 type ErrorNotFound struct {
 	Type  int   `json:"type"`
 	Error error `json:"error"`
+}
+
+func Test(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(string)
+
+	// respond to the client
+	w.Write([]byte(fmt.Sprintf("hi %s", user)))
 }
 
 // Fileserver for assents folder
@@ -193,4 +203,33 @@ func AverageGet(ClientDB *db.MongoConnection) http.HandlerFunc {
 		}
 	}
 
+}
+
+func AllAcces(w http.ResponseWriter, r *http.Request) {
+
+	w.WriteHeader(http.StatusOK)
+
+	w.Write([]byte(`{"message":"Hola a un punto publico! No necesitas acceder para ver esto."}`))
+}
+
+func PrivateAccess(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+
+	w.Write([]byte(`{"message":"Hello from a private endpoint! You need to be authenticated to see this."}`))
+}
+
+func PrivateAccessScoped(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	token := r.Context().Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
+
+	claims := token.CustomClaims.(*auth.CustomClaims)
+	if !claims.HasScope("read:messages") {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte(`{"message":"Insufficient scope."}`))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message":"Hello from a private endpoint! You need to be authenticated to see this."}`))
 }

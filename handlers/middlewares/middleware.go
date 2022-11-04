@@ -1,74 +1,15 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 )
 
-type Middleware func(http.HandlerFunc) http.HandlerFunc
+func Loggin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-func Logging() Middleware {
-	return func(NextHandler http.HandlerFunc) http.HandlerFunc {
-		handler := func(w http.ResponseWriter, r *http.Request) {
-			Cookie, _ := r.Cookie("Profile")
+		ctx := context.WithValue(r.Context(), "user", "123")
 
-			if Cookie != nil {
-				NextHandler(w, r)
-			}
-
-		}
-
-		return handler
-
-	}
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
-
-/*
-
-Example to create a Middleware
-
-func NewMiddleware() Middleware {
-
-	return func(NextHandler http.HandlerFunc) http.HandlerFunc {
-
-		handler := func(w http.ResponseWriter, r *http.Request) {
-
-			... White partther for middlerwares
-
-			NextHandler(w, r)
-
-		}
-
-		return handler
-
-	}
-
-}
-
-
-func Auth() Middleware {
-
-	return func(NextHandler http.HandlerFunc) http.HandlerFunc {
-
-		handler := func(w http.ResponseWriter, r *http.Request) {
-
-			// ... White partther for middlerwares
-
-			c, _ := r.Cookie("Profile")
-
-			if c.Value != "" {
-				Form := template.New("Form")
-
-				Form.Parse(templates.FormCredit)
-
-				Success := true
-				Form.Execute(w, Success)
-			}
-
-		}
-
-		return handler
-	}
-
-}
-
-*/

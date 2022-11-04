@@ -18,25 +18,26 @@ type CustomClaims struct {
 	Scope string `json:"scope"`
 }
 
-func (c CustomClaims) Validate(ctx context.Context) error {
-	return nil
-}
-
 func (c CustomClaims) HasScope(expectedScope string) bool {
 
 	result := strings.Split(c.Scope, " ")
-
 	for i := range result {
-		return (result[i] == expectedScope)
+		if result[i] == expectedScope {
+			return true
+		}
 	}
 
 	return false
 }
 
-func EnsureValidTolken() func(next http.Handler) http.Handler {
+// Validate implements validator.CustomClaims
+func (c CustomClaims) Validate(ctx context.Context) error {
+	return nil
+}
 
-	issuerURL, err := url.Parse("http://" + os.Getenv("AUTH0_DOMAIN") + "/")
-
+// EnsureValidToken is a middleware that will check the validity of our JWT.
+func EnsureValidToken() func(next http.Handler) http.Handler {
+	issuerURL, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/")
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
 	}
@@ -45,30 +46,25 @@ func EnsureValidTolken() func(next http.Handler) http.Handler {
 
 	jwtValidator, err := validator.New(
 		provider.KeyFunc,
-		validator.ES256,
+		validator.RS256,
 		issuerURL.String(),
-		[]string{
-			os.Getenv("AUTH0_AUDIENCE"),
-		},
-
+		[]string{os.Getenv("AUTH0_AUDIENCE")},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
-				return &CustomClaims{}
+				return CustomClaims{}
 			},
 		),
-
 		validator.WithAllowedClockSkew(time.Minute),
 	)
-
 	if err != nil {
-		log.Fatalf("Failed to parse the issuer url: %v", err)
+		log.Fatalf("Failed to set up the jwt validator")
 	}
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
 		log.Printf("Encountered error while validating JWT: %v", err)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-
 		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
 	}
 
