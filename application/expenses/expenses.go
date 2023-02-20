@@ -3,8 +3,8 @@ package expenses
 import (
 	"time"
 
-	"github.com/vicmanbrile/moneyGolang/app/dates"
-	"github.com/vicmanbrile/moneyGolang/schemas"
+	"github.com/vicmanbrile/moneyGolang/application/dates"
+	"github.com/vicmanbrile/moneyGolang/handlers/schemas"
 )
 
 type Credits struct {
@@ -35,7 +35,7 @@ func (c *Credits) Calculator(Average float64) (r schemas.Resumen) {
 
 		{ // Final
 
-			DaysMount := dates.DayOfYear((c.Datails.Mensualy * int(dates.DAYS_MOUNTH))).ToFraction()
+			DaysMount := dates.DayOfYear(c.Datails.Mensualy * int(dates.DAYS_MOUNTH)).ToFraction()
 
 			r.DateFinish = r.DateInit.AddDate(int(DaysMount.Years), int(DaysMount.Mounts), int(DaysMount.Days))
 		}
@@ -44,7 +44,7 @@ func (c *Credits) Calculator(Average float64) (r schemas.Resumen) {
 
 	/* Definimos el precio por dias de los creditos */
 	if c.Datails.Interes > 0 {
-		c.Datails.Precing *= (c.Datails.Interes + 1)
+		c.Datails.Precing *= c.Datails.Interes + 1
 	}
 
 	r.Price = dates.ToPriceInDays(c.Datails.Precing, Average)

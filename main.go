@@ -1,12 +1,14 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
-	"github.com/vicmanbrile/moneyGolang/handlers"
 	"log"
-	"net/http"
+
+	"github.com/joho/godotenv"
+	"github.com/vicmanbrile/moneyGolang/db"
+)
+
+var (
+	Port string = "8080"
 )
 
 func main() {
@@ -15,17 +17,14 @@ func main() {
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
-	r := chi.NewRouter()
+	moneyApp := &MoneyGolang{}
 
-	r.Use(middleware.Logger)
+	mongoConnection := db.NewMongoConnection()
 
-	r.Get("/", handlers.ShowCredits)
+	defer mongoConnection.CancelConection()
 
-	handlers.FileServer(r)
+	moneyApp.ClientDB = mongoConnection
 
-	r.Post("/user", handlers.SessionForm)
-	r.Get("/user", handlers.SessionFormGet)
-
-	log.Fatal(http.ListenAndServe(":8080", r))
+	moneyApp.ListenAndServe(Port)
 
 }

@@ -2,35 +2,50 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
 
-	profile "github.com/vicmanbrile/moneyGolang/app"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDataFindOne(id, coll string) ([]byte, error) {
-	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+type MongoConnection struct {
+	MongoClient      *mongo.Client
+	ContexWithCancel context.Context
+	FuncCancel       context.CancelFunc
+}
 
-	client, err := mongo.Connect(ctx, ClientOptions)
+func NewMongoConnection() *MongoConnection {
+	mc := &MongoConnection{}
+	var err error
+
+	ClientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION"))
+
+	mc.ContexWithCancel, mc.FuncCancel = context.WithCancel(context.Background())
+
+	mc.MongoClient, err = mongo.Connect(mc.ContexWithCancel, ClientOptions)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 
-	collect := client.Database("moneyGolang").Collection(coll)
+	return mc
+}
+
+func (mc *MongoConnection) CancelConection() {
+	mc.FuncCancel()
+}
+
+func (mc *MongoConnection) FindOne(key primitive.ObjectID, collection string) ([]byte, error) {
+
+	dbs := mc.MongoClient.Database("moneyGolang")
+
+	collect := dbs.Collection(collection)
 
 	var result bson.M
 
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	err = collect.FindOne(ctx, bson.D{{Key: "_id", Value: objectId}}).Decode(&result)
+	err := collect.FindOne(mc.ContexWithCancel, bson.D{{Key: "_id", Value: key}}).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +58,13 @@ func GetDataFindOne(id, coll string) ([]byte, error) {
 	return bsonData, nil
 }
 
-func GetDataProfile(Prfl Profile) (d *profile.Perfil, err error) {
-	// Se extrae la información de GetDataFindOne() para comprovar si hay error o no se encontro el archivo
-	profile, err := GetDataFindOne(Prfl.ID, "profile")
+func (mc *MongoConnection) InsetOne(document bson.D, collection string) {
+	coll := mc.MongoClient.Database("moneyGolang").Collection(collection)
+
+	result, err := coll.InsertOne(context.TODO(), document)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 
-	err = bson.Unmarshal(profile, &d)
-	if err != nil {
-		return nil, err
-	}
-
-	return
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 }
