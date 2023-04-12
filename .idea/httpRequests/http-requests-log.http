@@ -1,0 +1,83 @@
+POST http://localhost:8080/api/person
+Content-Type: application/json
+Content-Length: 23
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{"user": "vicmanbrile"}
+
+<> 2023-02-27T225047.200.json
+
+###
+
+GET http://localhost:8080/api/person
+Authorization: Basic vicmanbrile Fenian_135
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T224501.200.json
+
+###
+
+GET http://localhost:8080/api/person
+Authorization: Basic vicmanbrile Fenian_135
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T224446.200.json
+
+###
+
+GET http://localhost:8080/api/person
+Authorization: Basic vicmanbrile Fenian_135
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T224323.200.json
+
+###
+
+GET http://localhost:8080/api/person
+Authorization: Basic vicmanbrile Fenian_135
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T220917.200.json
+
+###
+
+GET http://localhost:8080/api/person/
+Content-Type: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T220613.404.txt
+
+###
+
+GET http://localhost:8080/api/person
+Content-Type: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T220559.401.txt
+
+###
+
+GET http://localhost:8080/api/person
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-02-26T220413.401.txt
+
+###
+

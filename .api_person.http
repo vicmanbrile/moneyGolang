@@ -1,0 +1,16 @@
+# curl -i http://127.0.0.1:8080/apì/person
+#	-u "vicmanbrile:Fenian_135"
+GET http://localhost:8080/api/person
+Authorization: Basic vicmanbrile Fenian_135
+
+###
+
+# curl -i http://127.0.0.1:8080/apì/person
+#	-H "Content-Type: application/json"
+#	-d '{"productId": 123456, "quantity": 100}'
+POST http://localhost:8080/api/person
+Content-Type: application/json
+
+{
+  "user": "vicmanbrile"
+}

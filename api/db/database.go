@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -67,4 +68,15 @@ func (mc *MongoConnection) InsetOne(document bson.D, collection string) {
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+}
+
+func SeachUser(user, pass string) (primitive.ObjectID, error) {
+
+	if user == "vicmanbrile" && pass == "Fenian_135" {
+		objectId, err := primitive.ObjectIDFromHex("6362b84b70a43aee546d8745")
+
+		return objectId, err
+	} else {
+		return primitive.NilObjectID, errors.New("No user Find")
+	}
 }

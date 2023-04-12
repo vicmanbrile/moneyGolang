@@ -1,14 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/joho/godotenv"
-	"github.com/vicmanbrile/moneyGolang/db"
+	router "github.com/vicmanbrile/moneyGolang/api"
+	"github.com/vicmanbrile/moneyGolang/api/db"
 )
 
 var (
-	Port string = "8080"
+	Port     string = "8080"
+	DATABASE *db.MongoConnection
 )
 
 func main() {
@@ -17,14 +21,11 @@ func main() {
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
-	moneyApp := &MoneyGolang{}
+	r, db := router.NewMoneyRouter()
 
-	mongoConnection := db.NewMongoConnection()
+	defer db.CancelConection()
 
-	defer mongoConnection.CancelConection()
-
-	moneyApp.ClientDB = mongoConnection
-
-	moneyApp.ListenAndServe(Port)
+	fmt.Printf("Server in http://localhost:%v\n", Port)
+	log.Fatal(http.ListenAndServe(":"+Port, r))
 
 }
