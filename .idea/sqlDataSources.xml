@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="b1e9a532-a083-4d8d-b57d-cc22865c8322" name="MoneyGolang Mapping">
+      <data-sources db="cc1767fa-1740-4c4f-a77d-1fd30d376d65" ddl="2bd5afc0-d7f8-4e6c-9301-ba3d413024b5" />
+      <scope>
+        <node kind="database" negative="1">
+          <node kind="schema" negative="1" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+</project>

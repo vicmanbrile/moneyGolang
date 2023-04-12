@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="@aplicacioneconomico.4zrhb.mongodb.net">
+  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.48">
+    <root id="1">
+      <ServerVersion>5.0.14</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="admin"/>
+    <schema id="3" parent="1" name="local"/>
+    <schema id="4" parent="1" name="moneyGolang"/>
+    <schema id="5" parent="1" name="telegom"/>
+    <table id="6" parent="4" name="deposits"/>
+    <column id="7" parent="6" name="_id">
+      <DasType>ObjectId|12s</DasType>
+      <Position>1</Position>
+    </column>
+    <column id="8" parent="6" name="deposits">
+      <DasType>Double|8s</DasType>
+      <Position>2</Position>
+    </column>
+    <column id="9" parent="6" name="year_day">
+      <DasType>Int32|4s</DasType>
+      <Position>3</Position>
+    </column>
+  </database-model>
+</dataSource>
